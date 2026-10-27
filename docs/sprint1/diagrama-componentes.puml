@@ -1,51 +1,39 @@
 @startuml diagrama-componentes
 skinparam shadowing false
 skinparam linetype ortho
-skinparam nodesep 40
-skinparam ranksep 50
-skinparam defaultFontSize 13
-skinparam packageStyle rectangle
-skinparam ArrowColor #333333
-skinparam packageBorderColor #333333
-skinparam packageFontStyle bold
-skinparam componentBackgroundColor #FFFFFF
-skinparam componentBorderColor #333333
-skinparam databaseBackgroundColor #D6EAF8
-skinparam cloudBackgroundColor #FDEBD0
+skinparam ranksep 40
+skinparam defaultFontSize 14
+skinparam ArrowColor #111111
+skinparam ArrowThickness 2
 
 title Diagrama de Componentes (MVC)\nSistema de Moeda Estudantil
 
-actor Usuario
+together {
+  actor "Usuário" as U
 
-rectangle "**1. VIEW (Apresentação)**\n----\nLogin/Cadastro\nPainel Aluno\nPainel Professor\nPainel Empresa" as VIEW #EAF2F8
+  rectangle "<b>1. VIEW</b>\nLogin · Painel Aluno · Painel Professor · Painel Empresa" as V #AED6F1
+  rectangle "<b>2. CONTROLLER</b>\nAuth · Aluno · Professor · Empresa · Vantagem · Transacao" as C #ABEBC6
+  rectangle "<b>3. SERVICES (Model)</b>\nAuth · Aluno · Professor · Empresa · Vantagem\nMoeda · Resgate · Email" as S #F9E79F
+  rectangle "<b>4. REPOSITORIES</b>\nUsuario · Aluno · Professor · Empresa\nVantagem · Transacao · Instituicao" as R #F5B7B1
+  database "Banco de Dados" as DB
+}
 
-rectangle "**2. CONTROLLER (Controle)**\n----\nAuthController\nAlunoController · ProfessorController\nEmpresaController · VantagemController\nTransacaoController" as CTRL #D5F5E3
+cloud "SMTP" as M
 
-rectangle "**3. SERVICES (Negócio / Model)**\n----\nAuthService · AlunoService · ProfessorService\nEmpresaService · VantagemService\nMoedaService (envio + crédito semestral)\nResgateService · EmailService" as SVC #FCF3CF
+U -down-> V
+V -down-> C
+C -down-> S
+S -down-> R
+R -down-> DB
+S --> M : e-mail
 
-rectangle "**4. REPOSITORIES (Persistência)**\n----\nUsuario · Aluno · Professor · Empresa\nVantagem · Transacao · Instituicao" as REPO #F5B7B1
-
-database "Banco de Dados" as DB
-cloud "SMTP (e-mail)" as SMTP
-
-Usuario -down-> VIEW : acessa telas
-VIEW -down-> CTRL : envia requisições
-CTRL -down-> SVC : chama regras de negócio
-SVC -down-> REPO : lê / grava dados
-REPO -down-> DB : ORM / SQL
-SVC -right-> SMTP : notifica\n(recebimento / cupom)
-
-legend left
-  **Como ler este diagrama**
-  Fluxo de cima para baixo = arquitetura MVC.
-  Cada caixa é uma camada; dentro dela estão os componentes.
-  Só há setas entre camadas (sem cruzamento).
+legend bottom
+  |= # |= Camada |= O que faz |
+  | 1 | View | Telas que o usuário vê |
+  | 2 | Controller | Recebe a requisição HTTP |
+  | 3 | Services | Regras (moedas, resgate, login) |
+  | 4 | Repositories | Acesso ao banco |
+  | — | SMTP | Envio de e-mails |
 endlegend
-
-note bottom of SVC
-  Regras principais no MoedaService / ResgateService:
-  saldo suficiente, motivo obrigatório,
-  +1000 moedas/semestre, geração de cupom.
-end note
 
 @enduml
