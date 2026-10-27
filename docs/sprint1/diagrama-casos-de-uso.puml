@@ -1,0 +1,66 @@
+@startuml Diagrama de Casos de Uso - Moeda Estudantil
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Aluno" as Aluno
+actor "Professor" as Professor
+actor "Empresa Parceira" as Empresa
+actor "Sistema de E-mail" as Email <<sistema>>
+
+rectangle "Sistema de Moeda Estudantil" {
+
+  usecase "UC01 - Realizar login" as UC01
+  usecase "UC02 - Cadastrar aluno" as UC02
+  usecase "UC03 - Cadastrar empresa parceira" as UC03
+  usecase "UC04 - Cadastrar vantagens" as UC04
+  usecase "UC05 - Enviar moedas ao aluno" as UC05
+  usecase "UC06 - Consultar extrato" as UC06
+  usecase "UC07 - Resgatar vantagem" as UC07
+  usecase "UC08 - Notificar recebimento de moedas" as UC08
+  usecase "UC09 - Enviar cupom de resgate" as UC09
+  usecase "UC10 - Creditar moedas semestrais" as UC10
+
+}
+
+Aluno --> UC01
+Aluno --> UC02
+Aluno --> UC06
+Aluno --> UC07
+
+Professor --> UC01
+Professor --> UC05
+Professor --> UC06
+
+Empresa --> UC01
+Empresa --> UC03
+Empresa --> UC04
+
+UC05 ..> UC08 : <<include>>
+UC07 ..> UC09 : <<include>>
+UC05 ..> UC01 : <<include>>
+UC06 ..> UC01 : <<include>>
+UC07 ..> UC01 : <<include>>
+UC04 ..> UC01 : <<include>>
+
+UC08 --> Email
+UC09 --> Email
+
+note right of UC10
+  A cada semestre o professor
+  recebe +1000 moedas
+  (saldo acumulável).
+end note
+
+note right of UC05
+  Exige saldo suficiente e
+  mensagem obrigatória
+  com o motivo do reconhecimento.
+end note
+
+note right of UC07
+  Gera código de cupom;
+  e-mail para aluno e empresa.
+end note
+
+@enduml

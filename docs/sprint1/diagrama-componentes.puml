@@ -1,0 +1,101 @@
+@startuml Diagrama de Componentes - Moeda Estudantil
+skinparam componentStyle rectangle
+
+package "Camada de Apresentação (View)" {
+  [Interface Web Aluno] as ViewAluno
+  [Interface Web Professor] as ViewProfessor
+  [Interface Web Empresa] as ViewEmpresa
+  [Interface de Login / Cadastro] as ViewAuth
+}
+
+package "Camada de Controle (Controller)" {
+  [AuthController] as AuthCtrl
+  [AlunoController] as AlunoCtrl
+  [ProfessorController] as ProfCtrl
+  [EmpresaController] as EmpCtrl
+  [VantagemController] as VantCtrl
+  [TransacaoController] as TransCtrl
+}
+
+package "Camada de Negócio (Model / Services)" {
+  [AuthService] as AuthSvc
+  [AlunoService] as AlunoSvc
+  [ProfessorService] as ProfSvc
+  [EmpresaService] as EmpSvc
+  [VantagemService] as VantSvc
+  [MoedaService] as MoedaSvc
+  [ResgateService] as ResgateSvc
+  [EmailService] as EmailSvc
+}
+
+package "Camada de Persistência" {
+  [UsuarioRepository] as UserRepo
+  [AlunoRepository] as AlunoRepo
+  [ProfessorRepository] as ProfRepo
+  [EmpresaRepository] as EmpRepo
+  [VantagemRepository] as VantRepo
+  [TransacaoRepository] as TransRepo
+  [InstituicaoRepository] as InstRepo
+}
+
+database "Banco de Dados" as DB
+
+cloud "Serviço de E-mail SMTP" as SMTP
+
+' View -> Controller
+ViewAuth --> AuthCtrl
+ViewAluno --> AlunoCtrl
+ViewAluno --> TransCtrl
+ViewAluno --> VantCtrl
+ViewProfessor --> ProfCtrl
+ViewProfessor --> TransCtrl
+ViewEmpresa --> EmpCtrl
+ViewEmpresa --> VantCtrl
+
+' Controller -> Service
+AuthCtrl --> AuthSvc
+AlunoCtrl --> AlunoSvc
+ProfCtrl --> ProfSvc
+EmpCtrl --> EmpSvc
+VantCtrl --> VantSvc
+TransCtrl --> MoedaSvc
+TransCtrl --> ResgateSvc
+
+' Service -> Service
+MoedaSvc --> EmailSvc
+ResgateSvc --> EmailSvc
+MoedaSvc --> AlunoSvc
+MoedaSvc --> ProfSvc
+
+' Service -> Repository
+AuthSvc --> UserRepo
+AlunoSvc --> AlunoRepo
+AlunoSvc --> InstRepo
+ProfSvc --> ProfRepo
+EmpSvc --> EmpRepo
+VantSvc --> VantRepo
+MoedaSvc --> TransRepo
+ResgateSvc --> TransRepo
+ResgateSvc --> VantRepo
+
+' Repository -> DB
+UserRepo --> DB
+AlunoRepo --> DB
+ProfRepo --> DB
+EmpRepo --> DB
+VantRepo --> DB
+TransRepo --> DB
+InstRepo --> DB
+
+' Email
+EmailSvc --> SMTP
+
+note bottom of AuthCtrl
+  Arquitetura MVC:
+  View (apresentação),
+  Controller (orquestração HTTP),
+  Model/Services + Repositories
+  (regras e persistência).
+end note
+
+@enduml

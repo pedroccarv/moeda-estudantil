@@ -1,0 +1,27 @@
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.iml
+
+# Build / deps (sprints futuras)
+node_modules/
+dist/
+build/
+target/
+*.class
+.env
+.env.*
+!.env.example
+
+# PlantUML temp
+*.png.cache
+out/
+
+# Local tooling
+.tools/

@@ -1,0 +1,112 @@
+@startuml Diagrama de Classes - Moeda Estudantil
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  BorderColor Black
+}
+hide circle
+
+abstract class Usuario {
+  - id: Long
+  - nome: String
+  - email: String
+  - senha: String
+  --
+  + autenticar(senha: String): boolean
+}
+
+class Aluno {
+  - cpf: String
+  - rg: String
+  - endereco: String
+  - curso: String
+  - saldoMoedas: Integer
+  --
+  + creditar(valor: Integer): void
+  + debitar(valor: Integer): void
+}
+
+class Professor {
+  - cpf: String
+  - departamento: String
+  - saldoMoedas: Integer
+  --
+  + enviarMoedas(aluno: Aluno, valor: Integer, motivo: String): TransacaoEnvio
+  + creditarSemestre(quantidade: Integer): void
+}
+
+class EmpresaParceira {
+  --
+  + cadastrarVantagem(vantagem: Vantagem): void
+}
+
+class InstituicaoEnsino {
+  - id: Long
+  - nome: String
+}
+
+class Vantagem {
+  - id: Long
+  - descricao: String
+  - fotoUrl: String
+  - custoEmMoedas: Integer
+}
+
+abstract class Transacao {
+  - id: Long
+  - dataHora: DateTime
+  - valor: Integer
+}
+
+class TransacaoEnvio {
+  - motivo: String
+}
+
+class TransacaoResgate {
+  - codigoCupom: String
+}
+
+class NotificacaoEmail {
+  - id: Long
+  - destinatario: String
+  - assunto: String
+  - corpo: String
+  - dataEnvio: DateTime
+  --
+  + enviar(): void
+}
+
+Usuario <|-- Aluno
+Usuario <|-- Professor
+Usuario <|-- EmpresaParceira
+
+InstituicaoEnsino "1" -- "0..*" Aluno : possui >
+InstituicaoEnsino "1" -- "0..*" Professor : vincula >
+
+EmpresaParceira "1" -- "0..*" Vantagem : oferece >
+
+Professor "1" -- "0..*" TransacaoEnvio : realiza >
+Aluno "1" -- "0..*" TransacaoEnvio : recebe >
+Transacao <|-- TransacaoEnvio
+
+Aluno "1" -- "0..*" TransacaoResgate : solicita >
+Vantagem "1" -- "0..*" TransacaoResgate : refere >
+EmpresaParceira "1" -- "0..*" TransacaoResgate : confere >
+Transacao <|-- TransacaoResgate
+
+TransacaoEnvio ..> NotificacaoEmail : gera
+TransacaoResgate ..> NotificacaoEmail : gera
+
+note right of Professor
+  A cada semestre: saldo += 1000
+  (acumulável).
+  Envio exige saldo >= valor
+  e motivo obrigatório.
+end note
+
+note right of TransacaoResgate
+  codigoCupom único;
+  e-mail para aluno e empresa.
+end note
+
+@enduml
