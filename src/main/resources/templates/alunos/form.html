@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Formulário Aluno</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<main class="container">
+    <div th:replace="~{fragments :: alerts}"></div>
+    <div class="card">
+        <h1 th:text="${aluno.id == null} ? 'Novo aluno' : 'Editar aluno'">Aluno</h1>
+        <form th:action="@{/alunos/salvar}" th:object="${aluno}" method="post" class="form-grid">
+            <input type="hidden" th:field="*{id}"/>
+
+            <label for="nome">Nome</label>
+            <input id="nome" th:field="*{nome}" required/>
+
+            <label for="email">E-mail</label>
+            <input id="email" type="email" th:field="*{email}" required/>
+
+            <label for="senha">Senha</label>
+            <input id="senha" type="password" th:field="*{senha}"
+                   th:required="${aluno.id == null}"
+                   th:placeholder="${aluno.id != null} ? 'Deixe em branco para manter'"/>
+
+            <label for="cpf">CPF</label>
+            <input id="cpf" th:field="*{cpf}" required/>
+
+            <label for="rg">RG</label>
+            <input id="rg" th:field="*{rg}" required/>
+
+            <label for="endereco">Endereço</label>
+            <input id="endereco" th:field="*{endereco}" required/>
+
+            <label for="curso">Curso</label>
+            <input id="curso" th:field="*{curso}" required/>
+
+            <label for="instituicaoId">Instituição de Ensino</label>
+            <select id="instituicaoId" name="instituicaoId" required>
+                <option value="">Selecione...</option>
+                <option th:each="i : ${instituicoes}"
+                        th:value="${i.id}"
+                        th:text="${i.nome}"
+                        th:selected="${aluno.instituicao != null and aluno.instituicao.id == i.id}"></option>
+            </select>
+
+            <div class="actions">
+                <button class="btn" type="submit">Salvar</button>
+                <a class="btn secondary" th:href="@{/alunos}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

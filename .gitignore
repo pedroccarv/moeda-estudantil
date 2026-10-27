@@ -9,7 +9,7 @@ Desktop.ini
 *.swp
 *.iml
 
-# Build / deps (sprints futuras)
+# Build / deps
 node_modules/
 dist/
 build/
@@ -18,6 +18,9 @@ target/
 .env
 .env.*
 !.env.example
+*.log
+.idea/
+*.iml
 
 # PlantUML temp
 *.png.cache

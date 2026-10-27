@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Empresas</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<main class="container">
+    <div th:replace="~{fragments :: alerts}"></div>
+    <div class="card">
+        <h1>Empresas Parceiras</h1>
+        <div class="actions">
+            <a class="btn" th:href="@{/empresas/nova}">Nova empresa</a>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>CNPJ</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${empresas}">
+                <td th:text="${e.nome}"></td>
+                <td th:text="${e.email}"></td>
+                <td th:text="${e.cnpj}"></td>
+                <td>
+                    <a class="btn secondary" th:href="@{/empresas/{id}/editar(id=${e.id})}">Editar</a>
+                    <form class="inline-form" th:action="@{/empresas/{id}/excluir(id=${e.id})}" method="post"
+                          onsubmit="return confirm('Excluir esta empresa?');">
+                        <button class="btn danger" type="submit">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(empresas)}">
+                <td colspan="4" class="muted">Nenhuma empresa cadastrada.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

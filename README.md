@@ -2,34 +2,62 @@
 
 Projeto da disciplina **Projeto de Software** (PUC Minas) — Laboratório 3.
 
-Sistema para estimular o reconhecimento do mérito estudantil por meio de uma moeda virtual: professores distribuem moedas aos alunos, que podem trocá-las por vantagens oferecidas por empresas parceiras.
+Stack: **Java 21 + Spring Boot + Spring Data JPA + Thymeleaf + PostgreSQL** (arquitetura MVC).
 
-## Arquitetura
+## Como executar (Sprint 2)
 
-O sistema será desenvolvido com arquitetura **MVC**, conforme especificação do laboratório.
+1. Suba o PostgreSQL:
 
-## Estrutura do repositório
-
-```
-docs/
-  sprint1/          # Lab03S01 — Modelagem
-  sprint2/          # Lab03S02 — Persistência e CRUDs iniciais
-  sprint3/          # Lab03S03 — CRUDs finais e apresentação
+```bash
+docker compose up -d
 ```
 
-## Sprint 1 (Lab03S01) — Modelagem
+2. Rode a aplicação:
 
-| Artefato | Fonte | Imagem |
-|----------|-------|--------|
-| Diagrama de Casos de Uso | [`.puml`](docs/sprint1/diagrama-casos-de-uso.puml) | [PNG](docs/sprint1/images/diagrama-casos-de-uso.png) |
-| Histórias do Usuário | [`.md`](docs/sprint1/historias-usuario.md) · [`.puml`](docs/sprint1/historias-usuario.puml) | [PNG](docs/sprint1/images/historias-usuario.png) |
-| Diagrama de Classes | [`.puml`](docs/sprint1/diagrama-classes.puml) | [PNG](docs/sprint1/images/diagrama-classes.png) |
-| Diagrama de Componentes | [`.puml`](docs/sprint1/diagrama-componentes.puml) | [PNG](docs/sprint1/images/diagrama-componentes.png) |
+```bash
+mvn spring-boot:run
+```
 
-**PDF de entrega (Sprint 1):** [docs/sprint1/Lab03S01_Moeda_Estudantil.pdf](docs/sprint1/Lab03S01_Moeda_Estudantil.pdf)
+3. Acesse http://localhost:8080
 
-Ver preview em [docs/sprint1/README.md](docs/sprint1/README.md).
+Credenciais do banco (padrão):
 
-## Equipe
+| Item | Valor |
+|------|-------|
+| URL | `jdbc:postgresql://localhost:5432/moeda_estudantil` |
+| Usuário | `moeda` |
+| Senha | `moeda123` |
 
-_Preencher com os membros do grupo._
+## Entregas
+
+### Sprint 1 (Lab03S01) — Modelagem
+
+Ver [docs/sprint1/](docs/sprint1/) · PDF: [Lab03S01_Moeda_Estudantil.pdf](docs/sprint1/Lab03S01_Moeda_Estudantil.pdf)
+
+### Sprint 2 (Lab03S02) — Persistência e CRUDs
+
+- Modelo ER: [docs/sprint2/modelo-er.puml](docs/sprint2/modelo-er.puml) · [PNG](docs/sprint2/images/modelo-er.png)
+- ORM: Spring Data JPA / Hibernate
+- CRUDs iniciais:
+  - Alunos: `/alunos`
+  - Empresas: `/empresas`
+
+Detalhes: [docs/sprint2/README.md](docs/sprint2/README.md)
+
+## Estrutura
+
+```
+src/main/java/br/pucminas/moeda/
+  domain/        # Entidades JPA
+  repository/    # Spring Data JPA (DAO)
+  service/       # Regras de negócio
+  web/           # Controllers MVC
+  config/        # Seed de instituições
+src/main/resources/templates/  # Front Thymeleaf
+docs/sprint1/    # UML Sprint 1
+docs/sprint2/    # ER + notas Sprint 2
+```
+
+## Autor
+
+Pedro Henrique Carvalho Pereira

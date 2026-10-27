@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Alunos</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<main class="container">
+    <div th:replace="~{fragments :: alerts}"></div>
+    <div class="card">
+        <h1>Alunos</h1>
+        <div class="actions">
+            <a class="btn" th:href="@{/alunos/novo}">Novo aluno</a>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>CPF</th>
+                <th>Curso</th>
+                <th>Instituição</th>
+                <th>Saldo</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${alunos}">
+                <td th:text="${a.nome}"></td>
+                <td th:text="${a.email}"></td>
+                <td th:text="${a.cpf}"></td>
+                <td th:text="${a.curso}"></td>
+                <td th:text="${a.instituicao.nome}"></td>
+                <td th:text="${a.saldoMoedas}"></td>
+                <td>
+                    <a class="btn secondary" th:href="@{/alunos/{id}/editar(id=${a.id})}">Editar</a>
+                    <form class="inline-form" th:action="@{/alunos/{id}/excluir(id=${a.id})}" method="post"
+                          onsubmit="return confirm('Excluir este aluno?');">
+                        <button class="btn danger" type="submit">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(alunos)}">
+                <td colspan="7" class="muted">Nenhum aluno cadastrado.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

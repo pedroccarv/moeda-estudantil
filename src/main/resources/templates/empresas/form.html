@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Formulário Empresa</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<main class="container">
+    <div th:replace="~{fragments :: alerts}"></div>
+    <div class="card">
+        <h1 th:text="${empresa.id == null} ? 'Nova empresa' : 'Editar empresa'">Empresa</h1>
+        <form th:action="@{/empresas/salvar}" th:object="${empresa}" method="post" class="form-grid">
+            <input type="hidden" th:field="*{id}"/>
+
+            <label for="nome">Nome</label>
+            <input id="nome" th:field="*{nome}" required/>
+
+            <label for="email">E-mail</label>
+            <input id="email" type="email" th:field="*{email}" required/>
+
+            <label for="senha">Senha</label>
+            <input id="senha" type="password" th:field="*{senha}"
+                   th:required="${empresa.id == null}"
+                   th:placeholder="${empresa.id != null} ? 'Deixe em branco para manter'"/>
+
+            <label for="cnpj">CNPJ</label>
+            <input id="cnpj" th:field="*{cnpj}"/>
+
+            <div class="actions">
+                <button class="btn" type="submit">Salvar</button>
+                <a class="btn secondary" th:href="@{/empresas}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

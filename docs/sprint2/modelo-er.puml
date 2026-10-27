@@ -1,0 +1,113 @@
+@startuml modelo-er
+hide circle
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor White
+  BorderColor #333333
+}
+
+title Modelo ER — Sistema de Moeda Estudantil (PostgreSQL / JPA)
+
+entity "instituicao_ensino" as inst {
+  * id : BIGSERIAL <<PK>>
+  --
+  * nome : VARCHAR(120) <<UK>>
+}
+
+entity "usuario" as usuario {
+  * id : BIGSERIAL <<PK>>
+  --
+  * nome : VARCHAR(120)
+  * email : VARCHAR(120) <<UK>>
+  * senha : VARCHAR(100)
+}
+
+entity "aluno" as aluno {
+  * usuario_id : BIGINT <<PK,FK>>
+  --
+  * cpf : VARCHAR(14) <<UK>>
+  * rg : VARCHAR(20)
+  * endereco : VARCHAR(200)
+  * curso : VARCHAR(100)
+  * saldo_moedas : INTEGER
+  * instituicao_id : BIGINT <<FK>>
+}
+
+entity "professor" as professor {
+  * usuario_id : BIGINT <<PK,FK>>
+  --
+  * cpf : VARCHAR(14) <<UK>>
+  * departamento : VARCHAR(100)
+  * saldo_moedas : INTEGER
+  * instituicao_id : BIGINT <<FK>>
+}
+
+entity "empresa_parceira" as empresa {
+  * usuario_id : BIGINT <<PK,FK>>
+  --
+  cnpj : VARCHAR(18)
+}
+
+entity "vantagem" as vantagem {
+  * id : BIGSERIAL <<PK>>
+  --
+  * descricao : VARCHAR(500)
+  * foto_url : VARCHAR(500)
+  * custo_em_moedas : INTEGER
+  * empresa_id : BIGINT <<FK>>
+}
+
+entity "transacao" as transacao {
+  * id : BIGSERIAL <<PK>>
+  --
+  * data_hora : TIMESTAMP
+  * valor : INTEGER
+}
+
+entity "transacao_envio" as envio {
+  * transacao_id : BIGINT <<PK,FK>>
+  --
+  * motivo : VARCHAR(500)
+  * professor_id : BIGINT <<FK>>
+  * aluno_id : BIGINT <<FK>>
+}
+
+entity "transacao_resgate" as resgate {
+  * transacao_id : BIGINT <<PK,FK>>
+  --
+  * codigo_cupom : VARCHAR(40) <<UK>>
+  * aluno_id : BIGINT <<FK>>
+  * vantagem_id : BIGINT <<FK>>
+}
+
+usuario ||--|| aluno
+usuario ||--|| professor
+usuario ||--|| empresa
+
+inst ||--o{ aluno
+inst ||--o{ professor
+
+empresa ||--o{ vantagem
+
+transacao ||--|| envio
+transacao ||--|| resgate
+
+professor ||--o{ envio
+aluno ||--o{ envio
+aluno ||--o{ resgate
+vantagem ||--o{ resgate
+
+note right of usuario
+  Herança JPA JOINED:
+  usuario (pai) + tabelas filhas
+  aluno / professor / empresa_parceira
+end note
+
+note bottom of transacao
+  Sprint 2: CRUD implementado
+  para aluno e empresa_parceira.
+  Demais tabelas modeladas
+  para sprints seguintes.
+end note
+
+@enduml

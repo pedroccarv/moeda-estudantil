@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Moeda Estudantil</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<main class="container">
+    <div class="card">
+        <h1>Sistema de Moeda Estudantil</h1>
+        <p class="muted">Sprint 2 — CRUDs iniciais de Aluno e Empresa Parceira (Spring Boot + JPA + PostgreSQL).</p>
+        <div class="actions">
+            <a class="btn" th:href="@{/alunos}">Gerenciar Alunos</a>
+            <a class="btn secondary" th:href="@{/empresas}">Gerenciar Empresas</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

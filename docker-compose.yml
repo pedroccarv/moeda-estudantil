@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: moeda-estudantil-db
+    environment:
+      POSTGRES_DB: moeda_estudantil
+      POSTGRES_USER: moeda
+      POSTGRES_PASSWORD: moeda123
+    ports:
+      - "5432:5432"
+    volumes:
+      - moeda_pgdata:/var/lib/postgresql/data
+
+volumes:
+  moeda_pgdata:
