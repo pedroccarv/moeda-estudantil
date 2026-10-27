@@ -2,6 +2,16 @@
 
 Entrega da Sprint 1 conforme o enunciado do Laboratório 3.
 
+## PDF de entrega
+
+Arquivo para envio da sprint: **[Lab03S01_Moeda_Estudantil.pdf](Lab03S01_Moeda_Estudantil.pdf)**
+
+Para regenerar:
+
+```powershell
+python docs\sprint1\gerar_pdf.py
+```
+
 ## Artefatos
 
 1. **Diagrama de Casos de Uso** — [`diagrama-casos-de-uso.puml`](diagrama-casos-de-uso.puml) · [PNG](images/diagrama-casos-de-uso.png)

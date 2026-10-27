@@ -26,6 +26,8 @@ docs/
 | Diagrama de Classes | [`.puml`](docs/sprint1/diagrama-classes.puml) | [PNG](docs/sprint1/images/diagrama-classes.png) |
 | Diagrama de Componentes | [`.puml`](docs/sprint1/diagrama-componentes.puml) | [PNG](docs/sprint1/images/diagrama-componentes.png) |
 
+**PDF de entrega (Sprint 1):** [docs/sprint1/Lab03S01_Moeda_Estudantil.pdf](docs/sprint1/Lab03S01_Moeda_Estudantil.pdf)
+
 Ver preview em [docs/sprint1/README.md](docs/sprint1/README.md).
 
 ## Equipe
