@@ -4,15 +4,34 @@ Entrega da Sprint 1 conforme o enunciado do Laboratório 3.
 
 ## Artefatos
 
-1. **Diagrama de Casos de Uso** — `diagrama-casos-de-uso.puml`
-2. **Histórias do Usuário** — `historias-usuario.md`
-3. **Diagrama de Classes** — `diagrama-classes.puml`
-4. **Diagrama de Componentes** — `diagrama-componentes.puml`
+1. **Diagrama de Casos de Uso** — [`diagrama-casos-de-uso.puml`](diagrama-casos-de-uso.puml)
+2. **Histórias do Usuário** — [`historias-usuario.md`](historias-usuario.md)
+3. **Diagrama de Classes** — [`diagrama-classes.puml`](diagrama-classes.puml)
+4. **Diagrama de Componentes** — [`diagrama-componentes.puml`](diagrama-componentes.puml)
 
-## Como visualizar PlantUML
+## Diagramas (PNG)
 
-- Extensão **PlantUML** no Cursor/VS Code (`jebbs.plantuml`), ou
-- Cole o conteúdo em https://www.plantuml.com/plantuml/uml
+### Casos de Uso
+
+![Diagrama de Casos de Uso](images/diagrama-casos-de-uso.png)
+
+### Classes
+
+![Diagrama de Classes](images/diagrama-classes.png)
+
+### Componentes
+
+![Diagrama de Componentes](images/diagrama-componentes.png)
+
+## Como regenerar as imagens
+
+Com Java e o JAR do PlantUML em `.tools/plantuml.jar`:
+
+```powershell
+java -jar .\.tools\plantuml.jar -tpng -charset UTF-8 -o "$PWD\docs\sprint1\images" docs\sprint1\*.puml
+```
+
+Depois renomeie os PNGs gerados para os nomes em `images/` (sem espaços), se necessário.
 
 ## Atores principais
 

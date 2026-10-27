@@ -19,14 +19,14 @@ docs/
 
 ## Sprint 1 (Lab03S01) — Modelagem
 
-| Artefato | Arquivo |
-|----------|---------|
-| Diagrama de Casos de Uso | [docs/sprint1/diagrama-casos-de-uso.puml](docs/sprint1/diagrama-casos-de-uso.puml) |
-| Histórias do Usuário | [docs/sprint1/historias-usuario.md](docs/sprint1/historias-usuario.md) |
-| Diagrama de Classes | [docs/sprint1/diagrama-classes.puml](docs/sprint1/diagrama-classes.puml) |
-| Diagrama de Componentes | [docs/sprint1/diagrama-componentes.puml](docs/sprint1/diagrama-componentes.puml) |
+| Artefato | Fonte | Imagem |
+|----------|-------|--------|
+| Diagrama de Casos de Uso | [`.puml`](docs/sprint1/diagrama-casos-de-uso.puml) | [PNG](docs/sprint1/images/diagrama-casos-de-uso.png) |
+| Histórias do Usuário | [`.md`](docs/sprint1/historias-usuario.md) | — |
+| Diagrama de Classes | [`.puml`](docs/sprint1/diagrama-classes.puml) | [PNG](docs/sprint1/images/diagrama-classes.png) |
+| Diagrama de Componentes | [`.puml`](docs/sprint1/diagrama-componentes.puml) | [PNG](docs/sprint1/images/diagrama-componentes.png) |
 
-Para visualizar os diagramas PlantUML, use a [extensão PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml) no VS Code/Cursor, ou o [PlantUML Online Server](https://www.plantuml.com/plantuml).
+Ver preview em [docs/sprint1/README.md](docs/sprint1/README.md).
 
 ## Equipe
 
