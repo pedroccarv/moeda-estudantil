@@ -1,0 +1,50 @@
+@startuml historias-usuario
+skinparam shadowing false
+skinparam defaultTextAlignment left
+skinparam packageStyle rectangle
+skinparam package {
+  FontStyle bold
+  BorderColor #444444
+}
+skinparam card {
+  BackgroundColor #FFFFFF
+  BorderColor #666666
+}
+
+title Histórias do Usuário — Sistema de Moeda Estudantil\nFormato: Como [ator], quero [ação], para [benefício]
+
+package "Épico 1 — Autenticação e cadastro" #E8F5E9 {
+  card "HU01 — Cadastro de aluno\nComo aluno, quero me cadastrar\n(nome, e-mail, CPF, RG, endereço,\ninstituição e curso) para participar." as HU01
+  card "HU02 — Cadastro de empresa\nComo empresa, quero me cadastrar\npara oferecer vantagens." as HU02
+  card "HU03 — Login\nComo aluno/professor/empresa,\nquero autenticar com login e senha\npara acessar meu perfil." as HU03
+}
+
+package "Épico 2 — Distribuição de moedas" #E3F2FD {
+  card "HU04 — Crédito semestral\nComo professor, quero receber\n1000 moedas por semestre\n(saldo acumulável)." as HU04
+  card "HU05 — Enviar moedas\nComo professor, quero enviar moedas\na um aluno com motivo obrigatório." as HU05
+  card "HU06 — Notificação por e-mail\nComo aluno, quero ser notificado\nao receber moedas." as HU06
+}
+
+package "Épico 3 — Extrato" #FFF8E1 {
+  card "HU07 — Extrato do professor\nComo professor, quero ver saldo\ne envios realizados." as HU07
+  card "HU08 — Extrato do aluno\nComo aluno, quero ver saldo,\nrecebimentos e resgates." as HU08
+}
+
+package "Épico 4 — Vantagens e resgate" #FCE4EC {
+  card "HU09 — Cadastrar vantagem\nComo empresa, quero cadastrar\nvantagem (descrição, foto, custo)." as HU09
+  card "HU10 — Resgatar vantagem\nComo aluno, quero resgatar uma\nvantagem e receber cupom por e-mail\n(empresa também é notificada)." as HU10
+}
+
+HU01 -[hidden]-> HU02
+HU02 -[hidden]-> HU03
+HU04 -[hidden]-> HU05
+HU05 -[hidden]-> HU06
+HU07 -[hidden]-> HU08
+HU09 -[hidden]-> HU10
+
+legend bottom
+  Detalhamento completo (critérios de aceite e rastreabilidade HU ↔ UC)
+  no arquivo historias-usuario.md
+endlegend
+
+@enduml

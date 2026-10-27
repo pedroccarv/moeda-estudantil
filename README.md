@@ -22,7 +22,7 @@ docs/
 | Artefato | Fonte | Imagem |
 |----------|-------|--------|
 | Diagrama de Casos de Uso | [`.puml`](docs/sprint1/diagrama-casos-de-uso.puml) | [PNG](docs/sprint1/images/diagrama-casos-de-uso.png) |
-| Histórias do Usuário | [`.md`](docs/sprint1/historias-usuario.md) | — |
+| Histórias do Usuário | [`.md`](docs/sprint1/historias-usuario.md) · [`.puml`](docs/sprint1/historias-usuario.puml) | [PNG](docs/sprint1/images/historias-usuario.png) |
 | Diagrama de Classes | [`.puml`](docs/sprint1/diagrama-classes.puml) | [PNG](docs/sprint1/images/diagrama-classes.png) |
 | Diagrama de Componentes | [`.puml`](docs/sprint1/diagrama-componentes.puml) | [PNG](docs/sprint1/images/diagrama-componentes.png) |
 

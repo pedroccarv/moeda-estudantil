@@ -1,101 +1,51 @@
-@startuml Diagrama de Componentes - Moeda Estudantil
-skinparam componentStyle rectangle
+@startuml diagrama-componentes
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 50
+skinparam defaultFontSize 13
+skinparam packageStyle rectangle
+skinparam ArrowColor #333333
+skinparam packageBorderColor #333333
+skinparam packageFontStyle bold
+skinparam componentBackgroundColor #FFFFFF
+skinparam componentBorderColor #333333
+skinparam databaseBackgroundColor #D6EAF8
+skinparam cloudBackgroundColor #FDEBD0
 
-package "Camada de Apresentação (View)" {
-  [Interface Web Aluno] as ViewAluno
-  [Interface Web Professor] as ViewProfessor
-  [Interface Web Empresa] as ViewEmpresa
-  [Interface de Login / Cadastro] as ViewAuth
-}
+title Diagrama de Componentes (MVC)\nSistema de Moeda Estudantil
 
-package "Camada de Controle (Controller)" {
-  [AuthController] as AuthCtrl
-  [AlunoController] as AlunoCtrl
-  [ProfessorController] as ProfCtrl
-  [EmpresaController] as EmpCtrl
-  [VantagemController] as VantCtrl
-  [TransacaoController] as TransCtrl
-}
+actor Usuario
 
-package "Camada de Negócio (Model / Services)" {
-  [AuthService] as AuthSvc
-  [AlunoService] as AlunoSvc
-  [ProfessorService] as ProfSvc
-  [EmpresaService] as EmpSvc
-  [VantagemService] as VantSvc
-  [MoedaService] as MoedaSvc
-  [ResgateService] as ResgateSvc
-  [EmailService] as EmailSvc
-}
+rectangle "**1. VIEW (Apresentação)**\n----\nLogin/Cadastro\nPainel Aluno\nPainel Professor\nPainel Empresa" as VIEW #EAF2F8
 
-package "Camada de Persistência" {
-  [UsuarioRepository] as UserRepo
-  [AlunoRepository] as AlunoRepo
-  [ProfessorRepository] as ProfRepo
-  [EmpresaRepository] as EmpRepo
-  [VantagemRepository] as VantRepo
-  [TransacaoRepository] as TransRepo
-  [InstituicaoRepository] as InstRepo
-}
+rectangle "**2. CONTROLLER (Controle)**\n----\nAuthController\nAlunoController · ProfessorController\nEmpresaController · VantagemController\nTransacaoController" as CTRL #D5F5E3
+
+rectangle "**3. SERVICES (Negócio / Model)**\n----\nAuthService · AlunoService · ProfessorService\nEmpresaService · VantagemService\nMoedaService (envio + crédito semestral)\nResgateService · EmailService" as SVC #FCF3CF
+
+rectangle "**4. REPOSITORIES (Persistência)**\n----\nUsuario · Aluno · Professor · Empresa\nVantagem · Transacao · Instituicao" as REPO #F5B7B1
 
 database "Banco de Dados" as DB
+cloud "SMTP (e-mail)" as SMTP
 
-cloud "Serviço de E-mail SMTP" as SMTP
+Usuario -down-> VIEW : acessa telas
+VIEW -down-> CTRL : envia requisições
+CTRL -down-> SVC : chama regras de negócio
+SVC -down-> REPO : lê / grava dados
+REPO -down-> DB : ORM / SQL
+SVC -right-> SMTP : notifica\n(recebimento / cupom)
 
-' View -> Controller
-ViewAuth --> AuthCtrl
-ViewAluno --> AlunoCtrl
-ViewAluno --> TransCtrl
-ViewAluno --> VantCtrl
-ViewProfessor --> ProfCtrl
-ViewProfessor --> TransCtrl
-ViewEmpresa --> EmpCtrl
-ViewEmpresa --> VantCtrl
+legend left
+  **Como ler este diagrama**
+  Fluxo de cima para baixo = arquitetura MVC.
+  Cada caixa é uma camada; dentro dela estão os componentes.
+  Só há setas entre camadas (sem cruzamento).
+endlegend
 
-' Controller -> Service
-AuthCtrl --> AuthSvc
-AlunoCtrl --> AlunoSvc
-ProfCtrl --> ProfSvc
-EmpCtrl --> EmpSvc
-VantCtrl --> VantSvc
-TransCtrl --> MoedaSvc
-TransCtrl --> ResgateSvc
-
-' Service -> Service
-MoedaSvc --> EmailSvc
-ResgateSvc --> EmailSvc
-MoedaSvc --> AlunoSvc
-MoedaSvc --> ProfSvc
-
-' Service -> Repository
-AuthSvc --> UserRepo
-AlunoSvc --> AlunoRepo
-AlunoSvc --> InstRepo
-ProfSvc --> ProfRepo
-EmpSvc --> EmpRepo
-VantSvc --> VantRepo
-MoedaSvc --> TransRepo
-ResgateSvc --> TransRepo
-ResgateSvc --> VantRepo
-
-' Repository -> DB
-UserRepo --> DB
-AlunoRepo --> DB
-ProfRepo --> DB
-EmpRepo --> DB
-VantRepo --> DB
-TransRepo --> DB
-InstRepo --> DB
-
-' Email
-EmailSvc --> SMTP
-
-note bottom of AuthCtrl
-  Arquitetura MVC:
-  View (apresentação),
-  Controller (orquestração HTTP),
-  Model/Services + Repositories
-  (regras e persistência).
+note bottom of SVC
+  Regras principais no MoedaService / ResgateService:
+  saldo suficiente, motivo obrigatório,
+  +1000 moedas/semestre, geração de cupom.
 end note
 
 @enduml
