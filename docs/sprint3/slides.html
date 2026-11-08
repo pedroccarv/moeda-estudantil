@@ -9,8 +9,12 @@
         * { box-sizing: border-box; }
         html, body { margin: 0; height: 100%; background: #102a43; color: #f0f4f8; font-family: "Segoe UI", Tahoma, sans-serif; }
         .deck { height: 100%; }
-        section { display: none; min-height: 100%; padding: 8vh 10vw; }
-        section.active { display: flex; flex-direction: column; justify-content: center; }
+        section {
+            display: none; min-height: 100%; padding: 8vh 10vw;
+            flex-direction: column; justify-content: center; align-items: flex-start;
+        }
+        section.active { display: flex; }
+        section h2, section ul, section ol, section p, section .flow { width: 100%; }
         h1 { font-size: 3rem; margin: 0 0 1rem; }
         h2 { font-size: 2.2rem; margin: 0 0 1.2rem; }
         p, li { font-size: 1.35rem; line-height: 1.45; }
@@ -22,6 +26,27 @@
         .flow { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; margin-top: .5rem; }
         .box { background: #0f6e56; color: white; padding: .8rem 1rem; border-radius: 10px; font-weight: 700; }
         .arrow { font-size: 1.6rem; }
+        .navbtn {
+            position: fixed; bottom: 1rem; background: #0f6e56; color: white;
+            border: none; border-radius: 8px; padding: .55rem .9rem; font-size: 1rem; cursor: pointer;
+        }
+        .navbtn.prev { left: 1rem; }
+        .navbtn.next { left: 8rem; }
+        @page { size: 13.333in 7.5in; margin: 0; }
+        @media print {
+            html, body { height: auto; background: #102a43; }
+            .deck { height: auto; }
+            section {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start;
+                width: 13.333in;
+                height: 7.5in;
+                page-break-after: always;
+                break-after: page;
+            }
+            .bar, .navbtn { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -30,7 +55,7 @@
         <p class="muted">Laboratório 3 · Sprint 3 · Projeto de Software</p>
         <h1>Sistema de Moeda Estudantil</h1>
         <p>Arquitetura MVC e camada de persistência.</p>
-        <p class="muted">Setas do teclado mudam o slide.</p>
+        <p class="muted">No PDF, um slide por página. No HTML, use Anterior e Próximo.</p>
     </section>
     <section>
         <h2>O que o sistema faz</h2>
@@ -106,6 +131,8 @@
     </section>
 </div>
 <div class="bar" id="pos"></div>
+<button class="navbtn prev" type="button" id="prev">Anterior</button>
+<button class="navbtn next" type="button" id="next">Próximo</button>
 <script>
     const slides = Array.from(document.querySelectorAll('.deck section'));
     let i = 0;
@@ -118,6 +145,8 @@
         if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(i + 1); e.preventDefault(); }
         if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(i - 1); e.preventDefault(); }
     });
+    document.getElementById('next').addEventListener('click', () => show(i + 1));
+    document.getElementById('prev').addEventListener('click', () => show(i - 1));
     show(0);
 </script>
 </body>

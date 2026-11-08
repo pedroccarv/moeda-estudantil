@@ -13,7 +13,8 @@
 
 ## Apresentação
 
-- Slides (abrir no navegador): [slides.html](slides.html)
+- Slides em PDF (abre no GitHub e no computador): [slides.pdf](slides.pdf)
+- Versão no navegador, com botões Anterior/Próximo: [slides.html](slides.html). No GitHub esse arquivo aparece como código. Para ver a apresentação, baixe o arquivo e abra no Chrome ou no Edge, ou use o PDF.
 - Roteiro de 20 minutos: [tutorial.md](tutorial.md)
 
 ## Modelos

@@ -58,7 +58,7 @@ Ver [docs/sprint1/](docs/sprint1/) · PDF: [Lab03S01_Moeda_Estudantil.pdf](docs/
 
 - Login por perfil e cadastro do próprio aluno ou da própria empresa
 - Crédito semestral, envio de moedas, extratos, vantagens e resgate com cupom
-- Slides: [docs/sprint3/slides.html](docs/sprint3/slides.html)
+- Slides: [docs/sprint3/slides.pdf](docs/sprint3/slides.pdf)
 - Roteiro do tutorial (20 min): [docs/sprint3/tutorial.md](docs/sprint3/tutorial.md)
 
 ## Rotas
