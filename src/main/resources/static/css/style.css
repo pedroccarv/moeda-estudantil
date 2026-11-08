@@ -67,3 +67,38 @@ input, select {
 .alert.err { background: #ffe3e3; color: var(--danger); }
 .muted { color: var(--muted); }
 .inline-form { display: inline; }
+textarea {
+  width: 100%;
+  padding: .55rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  min-height: 6rem;
+}
+.topbar nav { display: flex; align-items: center; flex-wrap: wrap; }
+.topbar button.linkish {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-left: 1rem;
+}
+.who { margin-left: 1rem; opacity: .85; }
+.saldo { font-size: 1.8rem; font-weight: 700; color: var(--accent); margin: .2rem 0 1rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.foto { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; background: #e4e7eb; }
+.email-corpo {
+  white-space: pre-wrap;
+  background: var(--bg);
+  padding: .75rem;
+  border-radius: 8px;
+  margin: .4rem 0 0;
+}
+.table-wrap { overflow-x: auto; }
+@media (max-width: 700px) {
+  .topbar { align-items: flex-start; gap: .4rem; }
+  .topbar a, .topbar button.linkish, .who { margin-left: .55rem; font-size: .92rem; }
+  h1 { font-size: 1.6rem; }
+}
+.cupom { font-family: ui-monospace, monospace; font-weight: 700; letter-spacing: .04em; }

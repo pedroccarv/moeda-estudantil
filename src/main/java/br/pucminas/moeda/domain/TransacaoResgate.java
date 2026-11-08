@@ -21,6 +21,13 @@ public class TransacaoResgate extends Transacao {
     public TransacaoResgate() {
     }
 
+    public TransacaoResgate(Integer valor, String codigoCupom, Aluno aluno, Vantagem vantagem) {
+        super(valor);
+        this.codigoCupom = codigoCupom;
+        this.aluno = aluno;
+        this.vantagem = vantagem;
+    }
+
     public String getCodigoCupom() {
         return codigoCupom;
     }

@@ -21,6 +21,13 @@ public class TransacaoEnvio extends Transacao {
     public TransacaoEnvio() {
     }
 
+    public TransacaoEnvio(Integer valor, String motivo, Professor professor, Aluno aluno) {
+        super(valor);
+        this.motivo = motivo;
+        this.professor = professor;
+        this.aluno = aluno;
+    }
+
     public String getMotivo() {
         return motivo;
     }

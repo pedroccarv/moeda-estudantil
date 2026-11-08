@@ -4,8 +4,31 @@
 <header th:fragment="topbar" class="topbar">
     <a class="brand" th:href="@{/}">Moeda Estudantil</a>
     <nav>
-        <a th:href="@{/alunos}">Alunos</a>
-        <a th:href="@{/empresas}">Empresas</a>
+        <th:block th:if="${sessao == null}">
+            <a th:href="@{/login}">Entrar</a>
+            <a th:href="@{/alunos/novo}">Cadastrar aluno</a>
+            <a th:href="@{/empresas/nova}">Cadastrar empresa</a>
+        </th:block>
+        <th:block th:if="${sessao != null and sessao.papel.name() == 'ALUNO'}">
+            <a th:href="@{/aluno}">Meu painel</a>
+            <a th:href="@{/aluno/extrato}">Extrato</a>
+            <a th:href="@{/aluno/vantagens}">Vantagens</a>
+        </th:block>
+        <th:block th:if="${sessao != null and sessao.papel.name() == 'PROFESSOR'}">
+            <a th:href="@{/professor}">Meu painel</a>
+            <a th:href="@{/professor/enviar}">Enviar moedas</a>
+            <a th:href="@{/professor/extrato}">Extrato</a>
+        </th:block>
+        <th:block th:if="${sessao != null and sessao.papel.name() == 'EMPRESA'}">
+            <a th:href="@{/empresa}">Meu painel</a>
+            <a th:href="@{/empresas/{id}/editar(id=${sessao.id})}">Meus dados</a>
+        </th:block>
+        <th:block th:if="${sessao != null}">
+            <span class="who" th:text="${sessao.nome}">Nome</span>
+            <form class="inline-form" th:action="@{/logout}" method="post">
+                <button class="linkish" type="submit">Sair</button>
+            </form>
+        </th:block>
     </nav>
 </header>
 
@@ -13,5 +36,16 @@
     <div th:if="${sucesso}" class="alert ok" th:text="${sucesso}"></div>
     <div th:if="${erro}" class="alert err" th:text="${erro}"></div>
 </div>
+
+<section th:fragment="emails">
+    <h2>E-mails</h2>
+    <p class="muted">Cada aviso fica registrado aqui. Se <code>spring.mail.host</code> estiver configurado, o mesmo texto também sai por SMTP.</p>
+    <article th:each="e : ${emails}" class="card" style="margin-bottom: .75rem;">
+        <strong th:text="${e.assunto}">Assunto</strong>
+        <p class="muted" th:text="${#temporals.format(e.dataEnvio, 'dd/MM/yyyy HH:mm')}">data</p>
+        <pre class="email-corpo" th:text="${e.corpo}">corpo</pre>
+    </article>
+    <p th:if="${#lists.isEmpty(emails)}" class="muted">Nenhum e-mail registrado.</p>
+</section>
 </body>
 </html>

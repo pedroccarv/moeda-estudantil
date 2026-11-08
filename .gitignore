@@ -28,3 +28,6 @@ out/
 
 # Local tooling
 .tools/
+
+# Uploads de fotos das vantagens
+/data/

@@ -11,11 +11,13 @@
 <main class="container">
     <div class="card">
         <h1>Sistema de Moeda Estudantil</h1>
-        <p class="muted">Sprint 2 — CRUDs iniciais de Aluno e Empresa Parceira (Spring Boot + JPA + PostgreSQL).</p>
+        <p>Professores distribuem moedas aos alunos como reconhecimento. O aluno troca essas moedas por vantagens de empresas parceiras.</p>
         <div class="actions">
-            <a class="btn" th:href="@{/alunos}">Gerenciar Alunos</a>
-            <a class="btn secondary" th:href="@{/empresas}">Gerenciar Empresas</a>
+            <a class="btn" th:href="@{/login}">Entrar</a>
+            <a class="btn secondary" th:href="@{/alunos/novo}">Cadastrar aluno</a>
+            <a class="btn secondary" th:href="@{/empresas/nova}">Cadastrar empresa</a>
         </div>
+        <p class="muted">Professores já entram com a conta enviada pela instituição. Alunos e empresas se cadastram aqui.</p>
     </div>
 </main>
 </body>

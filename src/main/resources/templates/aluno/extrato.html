@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Extrato do aluno</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<main class="container">
+    <div th:replace="~{fragments :: alerts}"></div>
+    <div class="card">
+        <h1>Extrato</h1>
+        <p>Saldo atual</p>
+        <p class="saldo" th:text="${aluno.saldoMoedas} + ' moedas'">0</p>
+
+        <h2>Moedas recebidas</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr><th>Data</th><th>Valor</th><th>Professor</th><th>Motivo</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="t : ${recebimentos}">
+                    <td th:text="${#temporals.format(t.dataHora, 'dd/MM/yyyy HH:mm')}">data</td>
+                    <td th:text="${t.valor}">0</td>
+                    <td th:text="${t.professor.nome}">professor</td>
+                    <td th:text="${t.motivo}">motivo</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(recebimentos)}">
+                    <td colspan="4" class="muted">Nenhuma moeda recebida.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Resgates</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr><th>Data</th><th>Valor</th><th>Vantagem</th><th>Empresa</th><th>Cupom</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${resgates}">
+                    <td th:text="${#temporals.format(r.dataHora, 'dd/MM/yyyy HH:mm')}">data</td>
+                    <td th:text="${r.valor}">0</td>
+                    <td th:text="${r.vantagem.descricao}">vantagem</td>
+                    <td th:text="${r.vantagem.empresa.nome}">empresa</td>
+                    <td class="cupom" th:text="${r.codigoCupom}">CODIGO</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(resgates)}">
+                    <td colspan="5" class="muted">Nenhum resgate.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:replace="~{fragments :: emails}"></div>
+    </div>
+</main>
+</body>
+</html>

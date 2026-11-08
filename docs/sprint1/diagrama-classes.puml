@@ -30,6 +30,7 @@ class Professor {
   - cpf: String
   - departamento: String
   - saldoMoedas: Integer
+  - ultimoPeriodoCreditado: String
   --
   + enviarMoedas(aluno: Aluno, valor: Integer, motivo: String): TransacaoEnvio
   + creditarSemestre(quantidade: Integer): void

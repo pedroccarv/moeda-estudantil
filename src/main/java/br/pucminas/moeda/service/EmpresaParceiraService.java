@@ -11,9 +11,11 @@ import java.util.List;
 public class EmpresaParceiraService {
 
     private final EmpresaParceiraRepository empresaRepository;
+    private final AuthService authService;
 
-    public EmpresaParceiraService(EmpresaParceiraRepository empresaRepository) {
+    public EmpresaParceiraService(EmpresaParceiraRepository empresaRepository, AuthService authService) {
         this.empresaRepository = empresaRepository;
+        this.authService = authService;
     }
 
     @Transactional(readOnly = true)
@@ -29,16 +31,25 @@ public class EmpresaParceiraService {
 
     @Transactional
     public EmpresaParceira salvar(EmpresaParceira empresa) {
+        if (empresa.getNome() == null || empresa.getNome().isBlank()) {
+            throw new IllegalArgumentException("Nome é obrigatório");
+        }
+        if (empresa.getEmail() == null || empresa.getEmail().isBlank()) {
+            throw new IllegalArgumentException("E-mail é obrigatório");
+        }
+        empresa.setNome(empresa.getNome().trim());
+        empresa.setEmail(empresa.getEmail().trim().toLowerCase());
+        if (empresa.getCnpj() != null) {
+            empresa.setCnpj(empresa.getCnpj().trim());
+        }
         if (empresa.getId() == null) {
-            if (empresaRepository.existsByEmail(empresa.getEmail())) {
-                throw new IllegalArgumentException("E-mail já cadastrado");
+            if (empresa.getSenha() == null || empresa.getSenha().isBlank()) {
+                throw new IllegalArgumentException("Senha é obrigatória");
             }
+            authService.validarEmailDisponivel(empresa.getEmail(), null);
         } else {
             EmpresaParceira existente = buscarPorId(empresa.getId());
-            if (!existente.getEmail().equals(empresa.getEmail())
-                    && empresaRepository.existsByEmail(empresa.getEmail())) {
-                throw new IllegalArgumentException("E-mail já cadastrado");
-            }
+            authService.validarEmailDisponivel(empresa.getEmail(), existente.getId());
             if (empresa.getSenha() == null || empresa.getSenha().isBlank()) {
                 empresa.setSenha(existente.getSenha());
             }

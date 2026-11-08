@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Moeda Estudantil — arquitetura e persistência</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; height: 100%; background: #102a43; color: #f0f4f8; font-family: "Segoe UI", Tahoma, sans-serif; }
+        .deck { height: 100%; }
+        section { display: none; min-height: 100%; padding: 8vh 10vw; }
+        section.active { display: flex; flex-direction: column; justify-content: center; }
+        h1 { font-size: 3rem; margin: 0 0 1rem; }
+        h2 { font-size: 2.2rem; margin: 0 0 1.2rem; }
+        p, li { font-size: 1.35rem; line-height: 1.45; }
+        ul { margin: 0; padding-left: 1.2rem; }
+        li + li { margin-top: .6rem; }
+        .muted { color: #9fb3c8; font-size: 1.1rem; }
+        code { background: #243b53; padding: .1rem .4rem; border-radius: 6px; }
+        .bar { position: fixed; bottom: 1rem; right: 1.5rem; color: #9fb3c8; }
+        .flow { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; margin-top: .5rem; }
+        .box { background: #0f6e56; color: white; padding: .8rem 1rem; border-radius: 10px; font-weight: 700; }
+        .arrow { font-size: 1.6rem; }
+    </style>
+</head>
+<body>
+<div class="deck">
+    <section class="active">
+        <p class="muted">Laboratório 3 · Sprint 3 · Projeto de Software</p>
+        <h1>Sistema de Moeda Estudantil</h1>
+        <p>Arquitetura MVC e camada de persistência.</p>
+        <p class="muted">Setas do teclado mudam o slide.</p>
+    </section>
+    <section>
+        <h2>O que o sistema faz</h2>
+        <ul>
+            <li>Aluno e empresa se cadastram. Professor já vem da instituição.</li>
+            <li>Todo uso passa por login e senha.</li>
+            <li>A cada semestre o professor ganha 1.000 moedas, somadas ao saldo.</li>
+            <li>Ele envia moedas a um aluno, com motivo obrigatório.</li>
+            <li>O aluno troca o saldo por uma vantagem e recebe um cupom.</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Arquitetura MVC</h2>
+        <div class="flow">
+            <div class="box">View<br/>Thymeleaf</div>
+            <span class="arrow">↓</span>
+            <div class="box">Controller<br/>Spring MVC</div>
+            <span class="arrow">↓</span>
+            <div class="box">Service<br/>regras</div>
+            <span class="arrow">↓</span>
+            <div class="box">Repository<br/>Spring Data</div>
+            <span class="arrow">↓</span>
+            <div class="box">PostgreSQL</div>
+        </div>
+        <p>O mesmo fluxo do diagrama de componentes. O e-mail sai do service, por SMTP quando configurado.</p>
+    </section>
+    <section>
+        <h2>Onde cada coisa mora</h2>
+        <ul>
+            <li><code>templates/</code> — o que a pessoa vê.</li>
+            <li><code>web/</code> — recebe o HTTP e devolve a tela ou um redirect.</li>
+            <li><code>service/</code> — semestre, envio, resgate, e-mail.</li>
+            <li><code>domain/</code> — as regras que não dependem da web: saldo, motivo, cupom.</li>
+            <li><code>repository/</code> — consulta e gravação. Sem SQL solto na tela.</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Sessão, não página aberta</h2>
+        <ul>
+            <li><code>AuthService</code> localiza o usuário pelo e-mail e chama <code>autenticar</code>.</li>
+            <li>A sessão guarda id, nome, e-mail e papel: aluno, professor ou empresa.</li>
+            <li>O interceptor manda para <code>/login</code> quem não entrou.</li>
+            <li>Cada controller recusa o papel errado. O aluno não abre o painel do professor.</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Persistência</h2>
+        <ul>
+            <li>JPA com herança <code>JOINED</code>: <code>usuario</code> e as tabelas filhas; o mesmo em <code>transacao</code>.</li>
+            <li>Instituição, vantagem, envio, resgate e notificação de e-mail têm tabela própria.</li>
+            <li>O Hibernate atualiza o esquema (<code>ddl-auto: update</code>).</li>
+            <li>PostgreSQL sobe com <code>docker compose up -d</code>.</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Regras que ficam no domínio</h2>
+        <ul>
+            <li>Semestre: soma 1.000 se aquele período ainda não foi creditado.</li>
+            <li>Envio: motivo preenchido e saldo do professor suficiente.</li>
+            <li>Resgate: debita o aluno, gera um código e manda o mesmo código aos dois e-mails.</li>
+            <li>Vantagem: descrição, foto e custo positivo, sempre de uma empresa.</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Como mostrar</h2>
+        <ol>
+            <li>Entrar como Ana Souza e ver as 1.000 moedas.</li>
+            <li>Cadastrar um aluno e enviar moedas com um motivo.</li>
+            <li>No extrato do aluno, ler o e-mail de recebimento.</li>
+            <li>Cadastrar uma empresa, publicar uma vantagem com foto.</li>
+            <li>Resgatar e conferir o mesmo cupom no aluno e na empresa.</li>
+        </ol>
+    </section>
+</div>
+<div class="bar" id="pos"></div>
+<script>
+    const slides = Array.from(document.querySelectorAll('.deck section'));
+    let i = 0;
+    function show(n) {
+        i = Math.max(0, Math.min(slides.length - 1, n));
+        slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+        document.getElementById('pos').textContent = (i + 1) + ' / ' + slides.length;
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(i + 1); e.preventDefault(); }
+        if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(i - 1); e.preventDefault(); }
+    });
+    show(0);
+</script>
+</body>
+</html>

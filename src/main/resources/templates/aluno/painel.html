@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Painel do aluno</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<main class="container">
+    <div th:replace="~{fragments :: alerts}"></div>
+    <div class="card">
+        <h1 th:text="${aluno.nome}">Aluno</h1>
+        <p class="muted" th:text="${aluno.curso + ' · ' + aluno.instituicao.nome}">Curso</p>
+        <p>Saldo</p>
+        <p class="saldo" th:text="${aluno.saldoMoedas} + ' moedas'">0</p>
+        <div class="actions">
+            <a class="btn" th:href="@{/aluno/vantagens}">Resgatar vantagem</a>
+            <a class="btn secondary" th:href="@{/aluno/extrato}">Ver extrato</a>
+            <a class="btn secondary" th:href="@{/alunos/{id}/editar(id=${aluno.id})}">Editar meus dados</a>
+        </div>
+        <form th:action="@{/alunos/{id}/excluir(id=${aluno.id})}" method="post"
+              onsubmit="return confirm('Excluir seu cadastro?');">
+            <button class="btn danger" type="submit">Excluir meu cadastro</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

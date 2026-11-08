@@ -39,6 +39,7 @@ entity "professor" as professor {
   * cpf : VARCHAR(14) <<UK>>
   * departamento : VARCHAR(100)
   * saldo_moedas : INTEGER
+  ultimo_periodo_creditado : VARCHAR(10)
   * instituicao_id : BIGINT <<FK>>
 }
 
@@ -70,6 +71,15 @@ entity "transacao_envio" as envio {
   * motivo : VARCHAR(500)
   * professor_id : BIGINT <<FK>>
   * aluno_id : BIGINT <<FK>>
+}
+
+entity "notificacao_email" as mail {
+  * id : BIGSERIAL <<PK>>
+  --
+  * destinatario : VARCHAR(120)
+  * assunto : VARCHAR(150)
+  * corpo : VARCHAR(2000)
+  * data_envio : TIMESTAMP
 }
 
 entity "transacao_resgate" as resgate {
@@ -104,10 +114,12 @@ note right of usuario
 end note
 
 note bottom of transacao
-  Sprint 2: CRUD implementado
-  para aluno e empresa_parceira.
-  Demais tabelas modeladas
-  para sprints seguintes.
+  Sprint 3: envio, resgate,
+  cupom e notificacao_email
+  estão implementados.
+  O crédito do semestre soma
+  1000 ao saldo e grava
+  ultimo_periodo_creditado.
 end note
 
 @enduml

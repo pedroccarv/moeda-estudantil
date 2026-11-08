@@ -2,8 +2,10 @@ package br.pucminas.moeda.service;
 
 import br.pucminas.moeda.domain.Aluno;
 import br.pucminas.moeda.domain.InstituicaoEnsino;
+import br.pucminas.moeda.domain.TransacaoEnvio;
 import br.pucminas.moeda.repository.AlunoRepository;
 import br.pucminas.moeda.repository.InstituicaoEnsinoRepository;
+import br.pucminas.moeda.repository.TransacaoEnvioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,11 +16,17 @@ public class AlunoService {
 
     private final AlunoRepository alunoRepository;
     private final InstituicaoEnsinoRepository instituicaoRepository;
+    private final TransacaoEnvioRepository envioRepository;
+    private final AuthService authService;
 
     public AlunoService(AlunoRepository alunoRepository,
-                        InstituicaoEnsinoRepository instituicaoRepository) {
+                        InstituicaoEnsinoRepository instituicaoRepository,
+                        TransacaoEnvioRepository envioRepository,
+                        AuthService authService) {
         this.alunoRepository = alunoRepository;
         this.instituicaoRepository = instituicaoRepository;
+        this.envioRepository = envioRepository;
+        this.authService = authService;
     }
 
     @Transactional(readOnly = true)
@@ -35,25 +43,47 @@ public class AlunoService {
         return aluno;
     }
 
+    @Transactional(readOnly = true)
+    public List<TransacaoEnvio> recebimentos(Long alunoId) {
+        return envioRepository.findByAlunoId(alunoId);
+    }
+
     @Transactional
     public Aluno salvar(Aluno aluno, Long instituicaoId) {
+        if (aluno.getNome() == null || aluno.getNome().isBlank()) {
+            throw new IllegalArgumentException("Nome é obrigatório");
+        }
+        if (aluno.getEmail() == null || aluno.getEmail().isBlank()) {
+            throw new IllegalArgumentException("E-mail é obrigatório");
+        }
+        if (aluno.getCpf() == null || aluno.getCpf().isBlank()
+                || aluno.getRg() == null || aluno.getRg().isBlank()
+                || aluno.getEndereco() == null || aluno.getEndereco().isBlank()
+                || aluno.getCurso() == null || aluno.getCurso().isBlank()) {
+            throw new IllegalArgumentException("Preencha CPF, RG, endereço e curso");
+        }
         InstituicaoEnsino instituicao = instituicaoRepository.findById(instituicaoId)
                 .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada"));
 
+        aluno.setNome(aluno.getNome().trim());
+        aluno.setEmail(aluno.getEmail().trim().toLowerCase());
+        aluno.setCpf(aluno.getCpf().trim());
+        aluno.setRg(aluno.getRg().trim());
+        aluno.setEndereco(aluno.getEndereco().trim());
+        aluno.setCurso(aluno.getCurso().trim());
+
         if (aluno.getId() == null) {
-            if (alunoRepository.existsByEmail(aluno.getEmail())) {
-                throw new IllegalArgumentException("E-mail já cadastrado");
+            if (aluno.getSenha() == null || aluno.getSenha().isBlank()) {
+                throw new IllegalArgumentException("Senha é obrigatória");
             }
+            authService.validarEmailDisponivel(aluno.getEmail(), null);
             if (alunoRepository.existsByCpf(aluno.getCpf())) {
                 throw new IllegalArgumentException("CPF já cadastrado");
             }
             aluno.setSaldoMoedas(0);
         } else {
             Aluno existente = buscarPorId(aluno.getId());
-            if (!existente.getEmail().equals(aluno.getEmail())
-                    && alunoRepository.existsByEmail(aluno.getEmail())) {
-                throw new IllegalArgumentException("E-mail já cadastrado");
-            }
+            authService.validarEmailDisponivel(aluno.getEmail(), existente.getId());
             if (!existente.getCpf().equals(aluno.getCpf())
                     && alunoRepository.existsByCpf(aluno.getCpf())) {
                 throw new IllegalArgumentException("CPF já cadastrado");

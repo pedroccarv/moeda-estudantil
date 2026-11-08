@@ -12,6 +12,7 @@
     <div th:replace="~{fragments :: alerts}"></div>
     <div class="card">
         <h1 th:text="${empresa.id == null} ? 'Nova empresa' : 'Editar empresa'">Empresa</h1>
+        <p class="muted" th:if="${empresa.id == null}">Depois de entrar, cadastre as vantagens com descrição, foto e custo em moedas.</p>
         <form th:action="@{/empresas/salvar}" th:object="${empresa}" method="post" class="form-grid">
             <input type="hidden" th:field="*{id}"/>
 

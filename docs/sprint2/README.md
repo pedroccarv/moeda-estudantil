@@ -4,9 +4,11 @@
 
 - Modelo ER: [`modelo-er.puml`](modelo-er.puml) · [`images/modelo-er.png`](images/modelo-er.png)
 - Estratégia de acesso: **Spring Data JPA** (ORM Hibernate) — repositórios no pacote `repository`
-- CRUDs iniciais (front Thymeleaf + back Spring MVC):
-  - Aluno (`/alunos`)
-  - Empresa Parceira (`/empresas`)
+- CRUDs iniciais (front Thymeleaf + back Spring MVC), na época em lista aberta:
+  - Aluno
+  - Empresa Parceira
+
+A versão final (Sprint 3) troca a lista aberta pelo cadastro de cada perfil, com login. Ver [../sprint3/README.md](../sprint3/README.md).
 
 ## Como rodar
 
