@@ -13,7 +13,7 @@
 
 ## Apresentação
 
-- Apresentação resumida com 7 slides: funcionalidades, tecnologias, arquitetura MVC, envio de moedas, e-mails, modelagem e resultados. Inclui os diagramas originais de [componentes](../sprint1/images/diagrama-componentes.png) e de [classes](../sprint1/images/diagrama-classes.png) da documentação do projeto. A apresentação pode ser feita sem executar o sistema. [Slides em PDF](slides.pdf).
+- Apresentação resumida com 8 slides: apresentação do grupo, funcionalidades, tecnologias, arquitetura MVC, envio de moedas, e-mails, modelagem e resultados. Inclui os diagramas originais de [componentes](../sprint1/images/diagrama-componentes.png) e de [classes](../sprint1/images/diagrama-classes.png) da documentação do projeto. A apresentação pode ser feita sem executar o sistema. [Slides em PDF](slides.pdf).
 
 ## Modelos
 
