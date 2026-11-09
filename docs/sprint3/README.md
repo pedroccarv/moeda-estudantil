@@ -14,7 +14,6 @@
 ## Apresentação
 
 - Apresentação resumida com 7 slides: funcionalidades, tecnologias, arquitetura MVC, exemplo de envio, integrações, execução e demonstração. [Slides em PDF](slides.pdf).
-- [Versão no navegador](slides.html), com botões Anterior/Próximo. As setas também navegam. No GitHub esse arquivo aparece como código; abra a cópia local no Chrome ou no Edge, ou use o PDF.
 
 ## Modelos
 
