@@ -40,6 +40,7 @@ entity "professor" as professor {
   * departamento : VARCHAR(100)
   * saldo_moedas : INTEGER
   ultimo_periodo_creditado : VARCHAR(10)
+  data_cadastro : DATE
   * instituicao_id : BIGINT <<FK>>
 }
 
@@ -80,6 +81,10 @@ entity "notificacao_email" as mail {
   * assunto : VARCHAR(150)
   * corpo : VARCHAR(2000)
   * data_envio : TIMESTAMP
+  * status : VARCHAR(20)
+  * tentativas : INTEGER
+  enviado_em : TIMESTAMP
+  ultima_tentativa_em : TIMESTAMP
 }
 
 entity "transacao_resgate" as resgate {
@@ -90,17 +95,17 @@ entity "transacao_resgate" as resgate {
   * vantagem_id : BIGINT <<FK>>
 }
 
-usuario ||--|| aluno
-usuario ||--|| professor
-usuario ||--|| empresa
+usuario ||--o| aluno
+usuario ||--o| professor
+usuario ||--o| empresa
 
 inst ||--o{ aluno
 inst ||--o{ professor
 
 empresa ||--o{ vantagem
 
-transacao ||--|| envio
-transacao ||--|| resgate
+transacao ||--o| envio
+transacao ||--o| resgate
 
 professor ||--o{ envio
 aluno ||--o{ envio
@@ -111,15 +116,25 @@ note right of usuario
   Herança JPA JOINED:
   usuario (pai) + tabelas filhas
   aluno / professor / empresa_parceira
+  Especialização total e disjunta na aplicação:
+  cada usuário é de exatamente um subtipo.
 end note
 
 note bottom of transacao
   Sprint 3: envio, resgate,
   cupom e notificacao_email
   estão implementados.
-  O crédito do semestre soma
-  1000 ao saldo e grava
+  Cada transação é envio OU resgate.
+  O crédito soma 1000 por período pendente
+  desde data_cadastro ou o último crédito e grava
   ultimo_periodo_creditado.
+end note
+
+note bottom of mail
+  data_envio registra a criação da notificação.
+  enviado_em registra o aceite pelo SMTP.
+  Novas mensagens: PENDENTE, ENVIADO ou FALHA.
+  Registros anteriores: LEGADO, sem reenvio automático.
 end note
 
 @enduml

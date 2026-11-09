@@ -1,11 +1,17 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:moeda;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: ${TEST_DATABASE_URL:jdbc:h2:mem:moeda;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    driver-class-name: ${TEST_DATABASE_DRIVER:org.h2.Driver}
+    username: ${TEST_DATABASE_USERNAME:sa}
+    password: ${TEST_DATABASE_PASSWORD:}
   jpa:
     hibernate:
       ddl-auto: create-drop
     open-in-view: false
     show-sql: false
+
+app:
+  jobs:
+    enabled: false
+  mail:
+    enabled: false

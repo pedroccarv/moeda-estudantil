@@ -82,7 +82,7 @@ public class AlunoPainelController {
             var resgate = resgateService.resgatar(sessao.getId(), id);
             redirect.addFlashAttribute("sucesso",
                     "Resgate concluído. Código do cupom: " + resgate.getCodigoCupom()
-                            + ". Enviamos o código para o seu e-mail e para a empresa.");
+                            + ". As notificações para você e para a empresa foram registradas para envio.");
             return "redirect:/aluno/extrato";
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirect.addFlashAttribute("erro", ex.getMessage());

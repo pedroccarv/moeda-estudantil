@@ -2,6 +2,8 @@
 
 Entrega da Sprint 1 conforme o enunciado do Laboratório 3.
 
+Os modelos e o PDF desta pasta refletem o código final, incluindo as correções de consistência e envio de e-mails. As versões originais de cada sprint permanecem no histórico do Git. As páginas de classes e componentes usam A3 em paisagem para preservar a legibilidade.
+
 ## PDF de entrega
 
 Arquivo para envio da sprint: **[Lab03S01_Moeda_Estudantil.pdf](Lab03S01_Moeda_Estudantil.pdf)**
@@ -9,6 +11,7 @@ Arquivo para envio da sprint: **[Lab03S01_Moeda_Estudantil.pdf](Lab03S01_Moeda_E
 Para regenerar:
 
 ```powershell
+python -m pip install reportlab Pillow
 python docs\sprint1\gerar_pdf.py
 ```
 

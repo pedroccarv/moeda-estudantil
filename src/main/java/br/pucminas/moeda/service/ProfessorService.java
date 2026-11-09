@@ -32,17 +32,25 @@ public class ProfessorService {
     }
 
     @Transactional
-    public boolean creditarSemestreSePendente(Long professorId) {
-        Professor professor = professorRepository.findById(professorId)
+    public int creditarSemestreSePendente(Long professorId) {
+        Professor professor = professorRepository.findByIdForUpdate(professorId)
                 .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado"));
         String periodo = PeriodoLetivo.atual();
-        if (periodo.equals(professor.getUltimoPeriodoCreditado())) {
-            return false;
+        int semestres;
+        if (professor.getUltimoPeriodoCreditado() != null) {
+            semestres = PeriodoLetivo.decorridos(professor.getUltimoPeriodoCreditado(), periodo);
+        } else {
+            String ingresso = professor.getDataCadastro() == null ? periodo : PeriodoLetivo.de(professor.getDataCadastro());
+            semestres = PeriodoLetivo.decorridos(ingresso, periodo) + 1;
         }
-        professor.creditarSemestre(MOEDAS_POR_SEMESTRE);
+        if (semestres <= 0) {
+            return 0;
+        }
+        int quantidade = Math.multiplyExact(semestres, MOEDAS_POR_SEMESTRE);
+        professor.creditarSemestre(quantidade);
         professor.setUltimoPeriodoCreditado(periodo);
         professorRepository.save(professor);
-        return true;
+        return quantidade;
     }
 
     @Transactional(readOnly = true)
@@ -60,9 +68,10 @@ public class ProfessorService {
 
     @Transactional
     public TransacaoEnvio enviarMoedas(Long professorId, Long alunoId, Integer valor, String motivo) {
-        Professor professor = professorRepository.findByIdWithInstituicao(professorId)
+        // Ordem fixa: professor antes de aluno. Todas as alterações de saldo usam estes bloqueios.
+        Professor professor = professorRepository.findByIdForUpdate(professorId)
                 .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado"));
-        Aluno aluno = alunoRepository.findById(alunoId)
+        Aluno aluno = alunoRepository.findByIdForUpdate(alunoId)
                 .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
         aluno.getNome();
         TransacaoEnvio envio = professor.enviarMoedas(aluno, valor, motivo);

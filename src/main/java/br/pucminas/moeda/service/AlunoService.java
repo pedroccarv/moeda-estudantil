@@ -82,7 +82,9 @@ public class AlunoService {
             }
             aluno.setSaldoMoedas(0);
         } else {
-            Aluno existente = buscarPorId(aluno.getId());
+            // A edição do cadastro participa do mesmo bloqueio usado pelos movimentos de saldo.
+            Aluno existente = alunoRepository.findByIdForUpdate(aluno.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado: " + aluno.getId()));
             authService.validarEmailDisponivel(aluno.getEmail(), existente.getId());
             if (!existente.getCpf().equals(aluno.getCpf())
                     && alunoRepository.existsByCpf(aluno.getCpf())) {

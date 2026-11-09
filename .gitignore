@@ -31,3 +31,7 @@ out/
 
 # Uploads de fotos das vantagens
 /data/
+
+# Material pessoal de apresentacao (somente local)
+/docs/sprint3/tutorial.md
+/docs/sprint3/slides-com-notas.html

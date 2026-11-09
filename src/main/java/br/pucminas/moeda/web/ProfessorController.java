@@ -68,12 +68,12 @@ public class ProfessorController {
             return bloqueio;
         }
         SessaoUsuario sessao = ModeloGlobal.atual(session);
-        boolean creditou = professorService.creditarSemestreSePendente(sessao.getId());
+        int creditadas = professorService.creditarSemestreSePendente(sessao.getId());
         if (alunoId == null || valor == null || motivo == null || motivo.isBlank()) {
             model.addAttribute("erro", "Informe o aluno, um valor positivo e o motivo.");
-            if (creditou) {
+            if (creditadas > 0) {
                 model.addAttribute("sucesso",
-                        "Foram creditadas 1.000 moedas do semestre " + PeriodoLetivo.rotulo()
+                        "Foram creditadas " + creditadas + " moedas dos períodos pendentes até " + PeriodoLetivo.rotulo()
                                 + ". O saldo que já existia foi mantido.");
             }
             model.addAttribute("professor", professorService.buscar(sessao.getId()));
@@ -85,9 +85,9 @@ public class ProfessorController {
         }
         try {
             professorService.enviarMoedas(sessao.getId(), alunoId, valor, motivo);
-            String mensagem = "Moedas enviadas. O aluno foi notificado por e-mail.";
-            if (creditou) {
-                mensagem = "Foram creditadas 1.000 moedas do semestre " + PeriodoLetivo.rotulo() + ". " + mensagem;
+            String mensagem = "Moedas enviadas. Notificação registrada para envio ao aluno.";
+            if (creditadas > 0) {
+                mensagem = "Foram creditadas " + creditadas + " moedas dos períodos pendentes até " + PeriodoLetivo.rotulo() + ". " + mensagem;
             }
             redirect.addFlashAttribute("sucesso", mensagem);
             return "redirect:/professor/extrato";
@@ -117,9 +117,10 @@ public class ProfessorController {
     }
 
     private void avisarCredito(Long professorId, Model model) {
-        if (professorService.creditarSemestreSePendente(professorId)) {
+        int creditadas = professorService.creditarSemestreSePendente(professorId);
+        if (creditadas > 0) {
             model.addAttribute("sucesso",
-                    "Foram creditadas 1.000 moedas do semestre " + PeriodoLetivo.rotulo()
+                    "Foram creditadas " + creditadas + " moedas dos períodos pendentes até " + PeriodoLetivo.rotulo()
                             + ". O saldo que já existia foi mantido.");
         }
     }

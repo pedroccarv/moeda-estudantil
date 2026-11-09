@@ -1,39 +1,36 @@
 @startuml diagrama-componentes
 skinparam shadowing false
 skinparam linetype ortho
-skinparam ranksep 40
-skinparam defaultFontSize 14
-skinparam ArrowColor #111111
-skinparam ArrowThickness 2
+skinparam componentStyle rectangle
+skinparam defaultFontSize 12
+top to bottom direction
 
-title Diagrama de Componentes (MVC)\nSistema de Moeda Estudantil
-
-together {
-  actor "Usuário" as U
-
-  rectangle "<b>1. VIEW</b>\nLogin · Painel Aluno · Painel Professor · Painel Empresa" as V #AED6F1
-  rectangle "<b>2. CONTROLLER</b>\nAuth · Aluno · Professor · Empresa · Vantagem · Transacao" as C #ABEBC6
-  rectangle "<b>3. SERVICES (Model)</b>\nAuth · Aluno · Professor · Empresa · Vantagem\nMoeda · Resgate · Email" as S #F9E79F
-  rectangle "<b>4. REPOSITORIES</b>\nUsuario · Aluno · Professor · Empresa\nVantagem · Transacao · Instituicao" as R #F5B7B1
-  database "Banco de Dados" as DB
-}
-
-cloud "SMTP" as M
-
+title Diagrama de Componentes (MVC) - Moeda Estudantil
+actor "Usuário" as U
+component "View / Thymeleaf\nLogin, cadastros, painéis e extratos" as V #AED6F1
+component "Controllers / web\nAuthController, HomeController\nAlunoController, AlunoPainelController\nEmpresaController, EmpresaPainelController\nProfessorController" as C #ABEBC6
+component "Services / Model\nAuthService, AlunoService, ProfessorService\nEmpresaParceiraService, VantagemService\nResgateService, EmailService, EmailEntregaService" as S #F9E79F
+component "Domínio / Model\nUsuario, Aluno, Professor, EmpresaParceira\nInstituicaoEnsino, Vantagem, Transacao\nTransacaoEnvio, TransacaoResgate, NotificacaoEmail" as D
+component "Repositories / Spring Data JPA\nUsuarioRepository, AlunoRepository, ProfessorRepository\nEmpresaParceiraRepository, InstituicaoEnsinoRepository\nVantagemRepository, TransacaoEnvioRepository\nTransacaoResgateRepository, NotificacaoEmailRepository" as R #F5B7B1
+component "Rotinas automáticas\nCreditoSemestralJob\nEmailDispatcher (após commit e novas tentativas)" as J
+component "FotoStorage" as F
+folder "data/uploads" as UP
+database "PostgreSQL" as DB
+cloud "Servidor SMTP\nMailpit no desenvolvimento" as M
 U -down-> V
 V -down-> C
 C -down-> S
+C ..> R : consulta de instituições
 S -down-> R
+S --> D : regras e entidades
 R -down-> DB
-S --> M : e-mail
-
-legend bottom
-  |= # |= Camada |= O que faz |
-  | 1 | View | Telas que o usuário vê |
-  | 2 | Controller | Recebe a requisição HTTP |
-  | 3 | Services | Regras (moedas, resgate, login) |
-  | 4 | Repositories | Acesso ao banco |
-  | — | SMTP | Envio de e-mails |
-endlegend
-
+J --> S
+S --> M : EmailEntregaService
+S --> F : VantagemService
+F --> UP
+note bottom of R
+  Bloqueios de escrita serializam alterações de saldo.
+  E-mails são persistidos na mesma transação das moedas;
+  envio SMTP somente após a confirmação no banco.
+end note
 @enduml

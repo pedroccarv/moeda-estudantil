@@ -1,6 +1,20 @@
 spring:
   application:
     name: moeda-estudantil
+  mail:
+    host: ${SPRING_MAIL_HOST:localhost}
+    port: ${SPRING_MAIL_PORT:1025}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      mail.smtp.auth: ${SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${SMTP_STARTTLS:false}
+      mail.smtp.starttls.required: ${SMTP_STARTTLS:false}
+      mail.smtp.ssl.enable: ${SMTP_SSL:false}
+      mail.smtp.connectiontimeout: 3000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
   datasource:
     url: jdbc:postgresql://localhost:5432/moeda_estudantil
     username: moeda
@@ -26,3 +40,9 @@ server:
   servlet:
     session:
       tracking-modes: cookie
+
+app:
+  mail:
+    from: ${APP_MAIL_FROM:no-reply@moeda-estudantil.local}
+    max-tentativas: ${APP_MAIL_MAX_TENTATIVAS:5}
+    retry-delay-ms: 60000

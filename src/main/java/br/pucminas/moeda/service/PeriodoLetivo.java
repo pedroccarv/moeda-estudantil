@@ -11,9 +11,22 @@ public final class PeriodoLetivo {
     }
 
     public static String atual() {
-        LocalDate hoje = LocalDate.now(ZONA);
-        int semestre = hoje.getMonthValue() <= 6 ? 1 : 2;
-        return hoje.getYear() + "-" + semestre;
+        return de(LocalDate.now(ZONA));
+    }
+
+    public static String de(LocalDate data) {
+        return data.getYear() + "-" + (data.getMonthValue() <= 6 ? 1 : 2);
+    }
+
+    public static int decorridos(String anterior, String atual) {
+        return indice(atual) - indice(anterior);
+    }
+
+    private static int indice(String periodo) {
+        if (periodo == null || !periodo.matches("\\d{4}-[12]")) {
+            throw new IllegalArgumentException("Período letivo inválido: " + periodo);
+        }
+        return Integer.parseInt(periodo.substring(0, 4)) * 2 + Integer.parseInt(periodo.substring(5));
     }
 
     public static String rotulo() {

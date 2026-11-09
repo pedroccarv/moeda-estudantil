@@ -46,7 +46,7 @@ public class ResgateService {
 
     @Transactional
     public TransacaoResgate resgatar(Long alunoId, Long vantagemId) {
-        Aluno aluno = alunoRepository.findById(alunoId)
+        Aluno aluno = alunoRepository.findByIdForUpdate(alunoId)
                 .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
         Vantagem vantagem = vantagemRepository.findByIdWithEmpresa(vantagemId)
                 .orElseThrow(() -> new IllegalArgumentException("Vantagem não encontrada"));

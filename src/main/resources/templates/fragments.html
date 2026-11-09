@@ -39,10 +39,13 @@
 
 <section th:fragment="emails">
     <h2>E-mails</h2>
-    <p class="muted">Cada aviso fica registrado aqui. Se <code>spring.mail.host</code> estiver configurado, o mesmo texto também sai por SMTP.</p>
+    <p class="muted">Consulte o conteúdo e a situação de envio de cada aviso. O cupom também pode ser apresentado diretamente pelo extrato.</p>
     <article th:each="e : ${emails}" class="card" style="margin-bottom: .75rem;">
         <strong th:text="${e.assunto}">Assunto</strong>
         <p class="muted" th:text="${#temporals.format(e.dataEnvio, 'dd/MM/yyyy HH:mm')}">data</p>
+        <p th:text="${e.statusDescricao}">Aguardando envio</p>
+        <p class="muted" th:if="${e.enviadoEm != null}"
+           th:text="'Enviado em ' + ${#temporals.format(e.enviadoEm, 'dd/MM/yyyy HH:mm')}"></p>
         <pre class="email-corpo" th:text="${e.corpo}">corpo</pre>
     </article>
     <p th:if="${#lists.isEmpty(emails)}" class="muted">Nenhum e-mail registrado.</p>

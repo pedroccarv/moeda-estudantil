@@ -1,6 +1,8 @@
 package br.pucminas.moeda.domain;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "professor")
@@ -18,6 +20,9 @@ public class Professor extends Usuario {
 
     @Column(length = 10)
     private String ultimoPeriodoCreditado;
+
+    // Nulo apenas em cadastros anteriores à inclusão deste campo.
+    private LocalDate dataCadastro = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "instituicao_id", nullable = false)
@@ -92,6 +97,14 @@ public class Professor extends Usuario {
 
     public String getUltimoPeriodoCreditado() {
         return ultimoPeriodoCreditado;
+    }
+
+    public LocalDate getDataCadastro() {
+        return dataCadastro;
+    }
+
+    public void setDataCadastro(LocalDate dataCadastro) {
+        this.dataCadastro = dataCadastro;
     }
 
     public void setUltimoPeriodoCreditado(String ultimoPeriodoCreditado) {
