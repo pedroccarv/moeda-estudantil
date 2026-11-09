@@ -13,7 +13,7 @@
 
 ## Apresentação
 
-- Apresentação resumida com 7 slides: funcionalidades, tecnologias, arquitetura MVC, envio de moedas, e-mails, exemplo de uso e resultados. A apresentação pode ser feita sem executar o sistema. [Slides em PDF](slides.pdf).
+- Apresentação resumida com 7 slides: funcionalidades, tecnologias, arquitetura MVC, envio de moedas, e-mails, exemplo de uso e resultados. Inclui dois diagramas simplificados: arquitetura e fluxo de moedas e resgate. A apresentação pode ser feita sem executar o sistema. [Slides em PDF](slides.pdf).
 
 ## Modelos
 
