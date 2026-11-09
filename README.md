@@ -108,5 +108,6 @@ Os testes usam H2 em memória e um servidor SMTP GreenMail isolado, sem enviar e
 Para repetir a suíte em um **banco PostgreSQL descartável**, configure `TEST_DATABASE_URL`, `TEST_DATABASE_DRIVER=org.postgresql.Driver`, `TEST_DATABASE_USERNAME` e `TEST_DATABASE_PASSWORD`. Os testes usam `create-drop`: nunca aponte essas variáveis para uma base com dados que deseja manter.
 
 ## Autor
-
+Daniel Verissimo
 Pedro Henrique Carvalho Pereira
+Pedro Soares
