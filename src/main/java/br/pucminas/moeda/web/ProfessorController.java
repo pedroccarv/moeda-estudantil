@@ -4,19 +4,19 @@ import br.pucminas.moeda.service.AlunoService;
 import br.pucminas.moeda.service.EmailService;
 import br.pucminas.moeda.service.PeriodoLetivo;
 import br.pucminas.moeda.service.ProfessorService;
-import br.pucminas.moeda.web.sessao.ModeloGlobal;
+import br.pucminas.moeda.web.dto.Contratos;
+import br.pucminas.moeda.web.sessao.SessaoGuard;
 import br.pucminas.moeda.web.sessao.SessaoUsuario;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping("/professor")
+import java.util.List;
+
+@RestController
 public class ProfessorController {
 
     private final ProfessorService professorService;
@@ -31,97 +31,55 @@ public class ProfessorController {
         this.emailService = emailService;
     }
 
-    @GetMapping
-    public String painel(HttpSession session, Model model, RedirectAttributes redirect) {
-        String bloqueio = ModeloGlobal.exigir(session, SessaoUsuario.Papel.PROFESSOR, redirect);
-        if (bloqueio != null) {
-            return bloqueio;
-        }
-        SessaoUsuario sessao = ModeloGlobal.atual(session);
-        avisarCredito(sessao.getId(), model);
-        model.addAttribute("professor", professorService.buscar(sessao.getId()));
-        return "professor/painel";
+    @GetMapping("/api/professor")
+    public Contratos.ProfessorDetalhe painel(HttpSession session) {
+        SessaoUsuario sessao = SessaoGuard.exigir(session, SessaoUsuario.Papel.PROFESSOR);
+        String aviso = creditar(sessao.getId());
+        return Contratos.ProfessorDetalhe.de(professorService.buscar(sessao.getId()), aviso);
     }
 
-    @GetMapping("/enviar")
-    public String enviarForm(HttpSession session, Model model, RedirectAttributes redirect) {
-        String bloqueio = ModeloGlobal.exigir(session, SessaoUsuario.Papel.PROFESSOR, redirect);
-        if (bloqueio != null) {
-            return bloqueio;
-        }
-        SessaoUsuario sessao = ModeloGlobal.atual(session);
-        avisarCredito(sessao.getId(), model);
-        model.addAttribute("professor", professorService.buscar(sessao.getId()));
-        model.addAttribute("alunos", alunoService.listar());
-        return "professor/enviar";
+    @GetMapping("/api/professor/alunos")
+    public List<Contratos.AlunoOpcao> alunos(HttpSession session) {
+        SessaoGuard.exigir(session, SessaoUsuario.Papel.PROFESSOR);
+        return alunoService.listar().stream().map(Contratos.AlunoOpcao::de).toList();
     }
 
-    @PostMapping("/enviar")
-    public String enviar(@RequestParam(required = false) Long alunoId,
-                         @RequestParam(required = false) Integer valor,
-                         @RequestParam(required = false) String motivo,
-                         HttpSession session,
-                         Model model,
-                         RedirectAttributes redirect) {
-        String bloqueio = ModeloGlobal.exigir(session, SessaoUsuario.Papel.PROFESSOR, redirect);
-        if (bloqueio != null) {
-            return bloqueio;
+    @PostMapping("/api/professor/envios")
+    public ResponseEntity<?> enviar(@RequestBody(required = false) Contratos.EnvioPedido pedido, HttpSession session) {
+        SessaoUsuario sessao = SessaoGuard.exigir(session, SessaoUsuario.Papel.PROFESSOR);
+        String aviso = creditar(sessao.getId());
+        if (pedido == null || pedido.alunoId() == null || pedido.valor() == null
+                || pedido.motivo() == null || pedido.motivo().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Contratos.Mensagem.de("Informe o aluno, um valor positivo e o motivo.", aviso));
         }
-        SessaoUsuario sessao = ModeloGlobal.atual(session);
-        int creditadas = professorService.creditarSemestreSePendente(sessao.getId());
-        if (alunoId == null || valor == null || motivo == null || motivo.isBlank()) {
-            model.addAttribute("erro", "Informe o aluno, um valor positivo e o motivo.");
-            if (creditadas > 0) {
-                model.addAttribute("sucesso",
-                        "Foram creditadas " + creditadas + " moedas dos períodos pendentes até " + PeriodoLetivo.rotulo()
-                                + ". O saldo que já existia foi mantido.");
-            }
-            model.addAttribute("professor", professorService.buscar(sessao.getId()));
-            model.addAttribute("alunos", alunoService.listar());
-            model.addAttribute("alunoId", alunoId);
-            model.addAttribute("valor", valor);
-            model.addAttribute("motivo", motivo);
-            return "professor/enviar";
+        professorService.enviarMoedas(sessao.getId(), pedido.alunoId(), pedido.valor(), pedido.motivo());
+        String mensagem = "Moedas enviadas. Notificação registrada para envio ao aluno.";
+        if (aviso != null) {
+            mensagem = aviso + " " + mensagem;
         }
-        try {
-            professorService.enviarMoedas(sessao.getId(), alunoId, valor, motivo);
-            String mensagem = "Moedas enviadas. Notificação registrada para envio ao aluno.";
-            if (creditadas > 0) {
-                mensagem = "Foram creditadas " + creditadas + " moedas dos períodos pendentes até " + PeriodoLetivo.rotulo() + ". " + mensagem;
-            }
-            redirect.addFlashAttribute("sucesso", mensagem);
-            return "redirect:/professor/extrato";
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            model.addAttribute("erro", ex.getMessage());
-            model.addAttribute("professor", professorService.buscar(sessao.getId()));
-            model.addAttribute("alunos", alunoService.listar());
-            model.addAttribute("alunoId", alunoId);
-            model.addAttribute("valor", valor);
-            model.addAttribute("motivo", motivo);
-            return "professor/enviar";
-        }
+        Integer saldo = professorService.buscar(sessao.getId()).getSaldoMoedas();
+        return ResponseEntity.ok(new Contratos.EnvioFeito(mensagem, aviso, saldo == null ? 0 : saldo));
     }
 
-    @GetMapping("/extrato")
-    public String extrato(HttpSession session, Model model, RedirectAttributes redirect) {
-        String bloqueio = ModeloGlobal.exigir(session, SessaoUsuario.Papel.PROFESSOR, redirect);
-        if (bloqueio != null) {
-            return bloqueio;
-        }
-        SessaoUsuario sessao = ModeloGlobal.atual(session);
-        avisarCredito(sessao.getId(), model);
-        model.addAttribute("professor", professorService.buscar(sessao.getId()));
-        model.addAttribute("envios", professorService.extrato(sessao.getId()));
-        model.addAttribute("emails", emailService.listarPorDestinatario(sessao.getEmail()));
-        return "professor/extrato";
+    @GetMapping("/api/professor/extrato")
+    public Contratos.ExtratoProfessor extrato(HttpSession session) {
+        SessaoUsuario sessao = SessaoGuard.exigir(session, SessaoUsuario.Papel.PROFESSOR);
+        String aviso = creditar(sessao.getId());
+        var professor = professorService.buscar(sessao.getId());
+        return new Contratos.ExtratoProfessor(
+                professor.getSaldoMoedas() == null ? 0 : professor.getSaldoMoedas(),
+                aviso,
+                professorService.extrato(sessao.getId()).stream().map(Contratos.EnvioLinha::de).toList(),
+                emailService.listarPorDestinatario(sessao.getEmail()).stream().map(Contratos.EmailItem::de).toList());
     }
 
-    private void avisarCredito(Long professorId, Model model) {
+    private String creditar(Long professorId) {
         int creditadas = professorService.creditarSemestreSePendente(professorId);
-        if (creditadas > 0) {
-            model.addAttribute("sucesso",
-                    "Foram creditadas " + creditadas + " moedas dos períodos pendentes até " + PeriodoLetivo.rotulo()
-                            + ". O saldo que já existia foi mantido.");
+        if (creditadas <= 0) {
+            return null;
         }
+        return "Foram creditadas " + creditadas + " moedas dos períodos pendentes até " + PeriodoLetivo.rotulo()
+                + ". O saldo que já existia foi mantido.";
     }
 }

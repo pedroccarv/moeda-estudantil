@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -49,99 +50,98 @@ class FluxoSistemaTest {
 
     @Test
     void cadastroPublicoIgnoraJsessionNaUrl() throws Exception {
-        mockMvc.perform(get("/alunos/novo;jsessionid=abc"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Nome")));
+        mockMvc.perform(get("/api/instituicoes;jsessionid=abc"))
+                .andExpect(status().isOk());
     }
 
     @Test
     void visitanteEhEnviadoAoLogin() throws Exception {
-        mockMvc.perform(get("/professor"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login"));
+        mockMvc.perform(get("/api/professor"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.mensagem").value("Entre para continuar."));
     }
 
     @Test
     void fluxoDeMoedasVantagemECupom() throws Exception {
-        mockMvc.perform(post("/login")
-                        .param("email", DataLoader.PROFESSOR_EMAIL)
-                        .param("senha", "errada"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("E-mail ou senha inválidos")));
+        mockMvc.perform(post("/api/sessao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"%s","senha":"errada"}
+                                """.formatted(DataLoader.PROFESSOR_EMAIL)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensagem").value("E-mail ou senha inválidos"));
 
         Long instituicaoId = instituicoes.findByNome("PUC Minas").orElseThrow().getId();
-        mockMvc.perform(post("/alunos/salvar")
-                        .param("nome", "Maria Silva")
-                        .param("email", "maria@aluno.com")
-                        .param("senha", "123456")
-                        .param("cpf", "333.333.333-33")
-                        .param("rg", "MG123456")
-                        .param("endereco", "Rua A, 10")
-                        .param("curso", "Engenharia de Software")
-                        .param("instituicaoId", instituicaoId.toString()))
-                .andExpect(redirectedUrl("/login"));
+        mockMvc.perform(post("/api/alunos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nome":"Maria Silva","email":"maria@aluno.com","senha":"123456","cpf":"333.333.333-33","rg":"MG123456","endereco":"Rua A, 10","curso":"Engenharia de Software","instituicaoId":%d}
+                                """.formatted(instituicaoId)))
+                .andExpect(status().isCreated());
 
-        mockMvc.perform(post("/empresas/salvar")
-                        .param("nome", "Cantina Central")
-                        .param("email", "cantina@empresa.com")
-                        .param("senha", "123456"))
-                .andExpect(redirectedUrl("/login"));
+        mockMvc.perform(post("/api/empresas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nome":"Cantina Central","email":"cantina@empresa.com","senha":"123456"}
+                                """))
+                .andExpect(status().isCreated());
 
-        MockHttpSession professor = login(DataLoader.PROFESSOR_EMAIL, DataLoader.PROFESSOR_SENHA, "/professor");
-        mockMvc.perform(get("/professor").session(professor))
+        MockHttpSession professor = login(DataLoader.PROFESSOR_EMAIL, DataLoader.PROFESSOR_SENHA, "PROFESSOR");
+        mockMvc.perform(get("/api/professor").session(professor))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("1000 moedas")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("1.000 moedas")));
+                .andExpect(jsonPath("$.saldoMoedas").value(1000));
 
-        mockMvc.perform(get("/professor").session(professor))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("1000 moedas")))
-                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("2000"))));
+        mockMvc.perform(get("/api/professor").session(professor))
+                .andExpect(jsonPath("$.saldoMoedas").value(1000));
 
         Usuario maria = usuarios.findByEmail("maria@aluno.com").orElseThrow();
-        mockMvc.perform(post("/professor/enviar").session(professor)
-                        .param("alunoId", maria.getId().toString())
-                        .param("valor", "200")
-                        .param("motivo", "Participacao destacada"))
-                .andExpect(redirectedUrl("/professor/extrato"));
+        mockMvc.perform(post("/api/professor/envios").session(professor)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"alunoId":%d,"valor":200,"motivo":"Participacao destacada"}
+                                """.formatted(maria.getId())))
+                .andExpect(status().isOk());
 
-        mockMvc.perform(get("/professor/extrato").session(professor))
+        mockMvc.perform(get("/api/professor/extrato").session(professor))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Participacao destacada")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("800 moedas")));
+                .andExpect(jsonPath("$.saldoMoedas").value(800))
+                .andExpect(jsonPath("$.envios[0].motivo").value("Participacao destacada"));
 
         Professor ana = (Professor) usuarios.findByEmail(DataLoader.PROFESSOR_EMAIL).orElseThrow();
         assertEquals(PeriodoLetivo.atual(), ana.getUltimoPeriodoCreditado());
         assertEquals(800, ana.getSaldoMoedas());
 
-        MockHttpSession aluno = login("maria@aluno.com", "123456", "/aluno");
-        mockMvc.perform(get("/aluno/extrato").session(aluno))
+        MockHttpSession aluno = login("maria@aluno.com", "123456", "ALUNO");
+        mockMvc.perform(get("/api/aluno/extrato").session(aluno))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.saldoMoedas").value(200))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Participacao destacada")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("você recebeu moedas")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("200 moedas")));
 
-        MockHttpSession empresa = login("cantina@empresa.com", "123456", "/empresa");
+        MockHttpSession empresa = login("cantina@empresa.com", "123456", "EMPRESA");
         MockMultipartFile foto = new MockMultipartFile(
                 "foto", "almoco.png", "image/png", new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47});
-        mockMvc.perform(multipart("/empresa/vantagens/salvar").file(foto)
+        mockMvc.perform(multipart("/api/empresa/vantagens").file(foto)
                         .param("descricao", "Desconto no almoco")
                         .param("custoEmMoedas", "150")
                         .session(empresa))
-                .andExpect(redirectedUrl("/empresa"));
+                .andExpect(status().isCreated());
 
         Long vantagemId = vantagens.findAll().get(0).getId();
-        mockMvc.perform(post("/aluno/vantagens/" + vantagemId + "/resgatar").session(aluno))
-                .andExpect(redirectedUrl("/aluno/extrato"));
-
-        MvcResult extrato = mockMvc.perform(get("/aluno/extrato").session(aluno))
+        mockMvc.perform(post("/api/aluno/vantagens/" + vantagemId + "/resgatar").session(aluno))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("50 moedas")))
+                .andExpect(jsonPath("$.codigoCupom").exists());
+
+        MvcResult extrato = mockMvc.perform(get("/api/aluno/extrato").session(aluno))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.saldoMoedas").value(50))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Desconto no almoco")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Código do cupom:")))
                 .andReturn();
 
         String codigoAluno = codigoDe(extrato.getResponse().getContentAsString());
-        mockMvc.perform(get("/empresa").session(empresa))
+        mockMvc.perform(get("/api/empresa").session(empresa))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(codigoAluno)))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("conferência")));
@@ -152,25 +152,29 @@ class FluxoSistemaTest {
         assertTrue(daEmpresa.stream().anyMatch(e -> e.getCorpo().contains("Código do cupom: " + codigoAluno)));
         assertEquals(1, daEmpresa.size());
 
-        mockMvc.perform(post("/aluno/vantagens/" + vantagemId + "/resgatar").session(aluno))
-                .andExpect(redirectedUrl("/aluno/vantagens"));
-        mockMvc.perform(get("/aluno/vantagens").session(aluno))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Saldo insuficiente")));
+        mockMvc.perform(post("/api/aluno/vantagens/" + vantagemId + "/resgatar").session(aluno))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensagem").value(org.hamcrest.Matchers.containsString("Saldo insuficiente")));
 
         Aluno saldo = (Aluno) usuarios.findByEmail("maria@aluno.com").orElseThrow();
         assertEquals(50, saldo.getSaldoMoedas());
         assertEquals(1, emails.findByDestinatarioOrderByDataEnvioDesc("cantina@empresa.com").size());
     }
 
-    private MockHttpSession login(String email, String senha, String destino) throws Exception {
-        MvcResult result = mockMvc.perform(post("/login").param("email", email).param("senha", senha))
-                .andExpect(redirectedUrl(destino))
+    private MockHttpSession login(String email, String senha, String papel) throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/sessao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"%s","senha":"%s"}
+                                """.formatted(email, senha)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.papel").value(papel))
                 .andReturn();
-        return (MockHttpSession) result.getRequest().getSession();
+        return (MockHttpSession) result.getRequest().getSession(false);
     }
 
-    private String codigoDe(String html) {
-        Matcher matcher = Pattern.compile("Código do cupom: ([A-Z2-9]{8})").matcher(html);
+    private String codigoDe(String json) {
+        Matcher matcher = Pattern.compile("Código do cupom: ([A-Z2-9]{8})").matcher(json);
         assertTrue(matcher.find());
         return matcher.group(1);
     }

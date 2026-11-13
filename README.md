@@ -2,7 +2,7 @@
 
 Projeto da disciplina **Projeto de Software** (PUC Minas) — Laboratório 3.
 
-Stack: **Java 21 + Spring Boot + Spring Data JPA + Thymeleaf + PostgreSQL** (arquitetura MVC).
+Stack: **Java 21 + Spring Boot + Spring Data JPA + PostgreSQL**, com o front em **React** na pasta `frontend/`. O Spring responde JSON em `/api` e mantém a sessão no cookie.
 
 ## Como executar
 
@@ -12,13 +12,23 @@ Stack: **Java 21 + Spring Boot + Spring Data JPA + Thymeleaf + PostgreSQL** (arq
 docker compose up -d
 ```
 
-2. Rode a aplicação:
+2. Rode a API:
 
 ```bash
 mvn spring-boot:run
 ```
 
-3. Acesse http://localhost:8080
+3. Em outro terminal, rode o front:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+4. Acesse http://localhost:5173
+
+Para servir o mesmo front pelo Spring, em `frontend/` rode `npm run build` e acesse http://localhost:8080. O build é gravado em `src/main/resources/static`.
 
 Credenciais do banco (padrão):
 
@@ -69,16 +79,18 @@ Ver [docs/sprint1/](docs/sprint1/) · PDF: [Lab03S01_Moeda_Estudantil.pdf](docs/
 
 - Login por perfil e cadastro do próprio aluno ou da própria empresa
 - Crédito semestral, envio de moedas, extratos, vantagens e resgate com cupom
-- Slides: [docs/sprint3/slides.pdf](docs/sprint3/slides.pdf)
+- Slides: [docs/sprint3/slides.pptx](docs/sprint3/slides.pptx) · [PDF](docs/sprint3/slides.pdf)
 
 ## Rotas
 
-| Quem | Onde |
-|------|------|
-| Visitante | `/`, `/login`, `/alunos/novo`, `/empresas/nova` |
-| Aluno | `/aluno`, `/aluno/extrato`, `/aluno/vantagens` |
-| Professor | `/professor`, `/professor/enviar`, `/professor/extrato` |
-| Empresa | `/empresa`, `/empresa/vantagens/nova` |
+O navegador usa caminhos comuns (`http://localhost:5173/aluno`). Os dados passam por `/api`.
+
+| Quem | Tela | API |
+|------|------|-----|
+| Visitante | `/`, `/entrar`, `/cadastro/aluno`, `/cadastro/empresa` | `POST /api/sessao`, `POST /api/alunos`, `POST /api/empresas` |
+| Aluno | `/aluno`, `/aluno/extrato`, `/aluno/vantagens` | `/api/aluno` |
+| Professor | `/professor`, `/professor/enviar`, `/professor/extrato` | `/api/professor` |
+| Empresa | `/empresa`, `/empresa/vantagens/nova` | `/api/empresa` |
 
 ## Estrutura
 
@@ -89,7 +101,8 @@ src/main/java/br/pucminas/moeda/
   service/       # Regras de negócio
   web/           # Controllers MVC
   config/        # Seed e recursos estáticos de upload
-src/main/resources/templates/
+src/main/resources/static/   # build do React
+frontend/                    # Vite, React e React Router
 docs/sprint1/    # UML da Sprint 1
 docs/sprint2/    # ER
 docs/sprint3/    # Slides e documentação

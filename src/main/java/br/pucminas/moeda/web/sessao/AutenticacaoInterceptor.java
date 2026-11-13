@@ -20,7 +20,10 @@ public class AutenticacaoInterceptor implements HandlerInterceptor {
         if (session != null && session.getAttribute(SessaoUsuario.CHAVE) instanceof SessaoUsuario) {
             return true;
         }
-        response.sendRedirect(request.getContextPath() + "/login");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"mensagem\":\"Entre para continuar.\"}");
         return false;
     }
 
@@ -38,23 +41,19 @@ public class AutenticacaoInterceptor implements HandlerInterceptor {
     }
 
     private boolean publico(HttpServletRequest request, String path) {
-        if (path.equals("/")
-                || path.equals("/login")
-                || path.equals("/logout")
-                || path.equals("/error")
-                || path.equals("/favicon.ico")
-                || path.startsWith("/css/")
-                || path.startsWith("/uploads/")) {
+        if (!path.startsWith("/api")) {
             return true;
         }
-        if (path.equals("/alunos/novo") || path.equals("/empresas/nova")) {
+        if ("POST".equalsIgnoreCase(request.getMethod()) && path.equals("/api/sessao")) {
             return true;
         }
-        if ("POST".equalsIgnoreCase(request.getMethod())
-                && (path.equals("/alunos/salvar") || path.equals("/empresas/salvar"))) {
-            String id = request.getParameter("id");
-            return id == null || id.isBlank();
+        if ("DELETE".equalsIgnoreCase(request.getMethod()) && path.equals("/api/sessao")) {
+            return true;
         }
-        return false;
+        if ("GET".equalsIgnoreCase(request.getMethod()) && path.equals("/api/instituicoes")) {
+            return true;
+        }
+        return "POST".equalsIgnoreCase(request.getMethod())
+                && (path.equals("/api/alunos") || path.equals("/api/empresas"));
     }
 }
