@@ -2,7 +2,7 @@ package br.pucminas.moeda.web;
 
 import br.pucminas.moeda.domain.Aluno;
 import br.pucminas.moeda.service.AlunoService;
-import br.pucminas.moeda.service.EmailService;
+import br.pucminas.moeda.service.AlunoExtratoFacade;
 import br.pucminas.moeda.service.ResgateService;
 import br.pucminas.moeda.service.VantagemService;
 import br.pucminas.moeda.web.dto.Contratos;
@@ -26,16 +26,16 @@ public class AlunoController {
     private final AlunoService alunoService;
     private final VantagemService vantagemService;
     private final ResgateService resgateService;
-    private final EmailService emailService;
+    private final AlunoExtratoFacade alunoExtratoFacade;
 
     public AlunoController(AlunoService alunoService,
                            VantagemService vantagemService,
                            ResgateService resgateService,
-                           EmailService emailService) {
+                           AlunoExtratoFacade alunoExtratoFacade) {
         this.alunoService = alunoService;
         this.vantagemService = vantagemService;
         this.resgateService = resgateService;
-        this.emailService = emailService;
+        this.alunoExtratoFacade = alunoExtratoFacade;
     }
 
     @PostMapping("/api/alunos")
@@ -76,12 +76,7 @@ public class AlunoController {
     @GetMapping("/api/aluno/extrato")
     public Contratos.ExtratoAluno extrato(HttpSession session) {
         SessaoUsuario sessao = SessaoGuard.exigir(session, SessaoUsuario.Papel.ALUNO);
-        Aluno aluno = alunoService.buscarPorId(sessao.getId());
-        return new Contratos.ExtratoAluno(
-                aluno.getSaldoMoedas() == null ? 0 : aluno.getSaldoMoedas(),
-                alunoService.recebimentos(sessao.getId()).stream().map(Contratos.Recebimento::de).toList(),
-                resgateService.extratoDoAluno(sessao.getId()).stream().map(Contratos.ResgateLinha::de).toList(),
-                emailService.listarPorDestinatario(sessao.getEmail()).stream().map(Contratos.EmailItem::de).toList());
+        return alunoExtratoFacade.carregar(sessao.getId(), sessao.getEmail());
     }
 
     @GetMapping("/api/aluno/vantagens")

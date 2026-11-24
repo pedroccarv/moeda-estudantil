@@ -20,15 +20,18 @@ public class ProfessorService {
     private final AlunoRepository alunoRepository;
     private final TransacaoEnvioRepository envioRepository;
     private final EmailService emailService;
+    private final EmailTemplateService emailTemplateService;
 
     public ProfessorService(ProfessorRepository professorRepository,
                             AlunoRepository alunoRepository,
                             TransacaoEnvioRepository envioRepository,
-                            EmailService emailService) {
+                            EmailService emailService,
+                            EmailTemplateService emailTemplateService) {
         this.professorRepository = professorRepository;
         this.alunoRepository = alunoRepository;
         this.envioRepository = envioRepository;
         this.emailService = emailService;
+        this.emailTemplateService = emailTemplateService;
     }
 
     @Transactional
@@ -81,15 +84,7 @@ public class ProfessorService {
         emailService.enviar(
                 aluno.getEmail(),
                 "Moeda Estudantil — você recebeu moedas",
-                corpoRecebimento(professor, valor, envio.getMotivo()));
+                emailTemplateService.recebimentoMoedas(professor, valor, envio.getMotivo()));
         return envio;
-    }
-
-    private String corpoRecebimento(Professor professor, Integer valor, String motivo) {
-        return "Olá.\n\n"
-                + "Você recebeu " + valor + " moedas de " + professor.getNome()
-                + " (" + professor.getInstituicao().getNome() + ").\n\n"
-                + "Motivo: " + motivo + ".\n\n"
-                + "Consulte o extrato no Sistema de Moeda Estudantil.";
     }
 }
