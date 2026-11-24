@@ -45,6 +45,26 @@ public final class Contratos {
 
     public record AlunoPedido(String nome, String email, String senha, String cpf, String rg,
                               String endereco, String curso, Long instituicaoId) {
+        /** Information Expert (GRASP): o DTO detém os dados da requisição e constrói a entidade. */
+        public Aluno paraEntidade(Long id) {
+            Aluno aluno = new Aluno();
+            aluno.setId(id);
+            aluno.setNome(nome);
+            aluno.setEmail(email);
+            aluno.setSenha(senha);
+            aluno.setCpf(cpf);
+            aluno.setRg(rg);
+            aluno.setEndereco(endereco);
+            aluno.setCurso(curso);
+            return aluno;
+        }
+
+        public Long instituicaoObrigatoria() {
+            if (instituicaoId == null) {
+                throw new IllegalArgumentException("Selecione a instituição");
+            }
+            return instituicaoId;
+        }
     }
 
     public record AlunoDetalhe(Long id, String nome, String email, String cpf, String rg, String endereco,
@@ -64,6 +84,16 @@ public final class Contratos {
     }
 
     public record EmpresaPedido(String nome, String email, String senha, String cnpj) {
+        /** Information Expert (GRASP): o DTO detém os dados da requisição e constrói a entidade. */
+        public EmpresaParceira paraEntidade(Long id) {
+            EmpresaParceira empresa = new EmpresaParceira();
+            empresa.setId(id);
+            empresa.setNome(nome);
+            empresa.setEmail(email);
+            empresa.setSenha(senha);
+            empresa.setCnpj(cnpj);
+            return empresa;
+        }
     }
 
     public record EmpresaDetalhe(Long id, String nome, String email, String cnpj) {

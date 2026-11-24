@@ -40,7 +40,10 @@ public class AlunoController {
 
     @PostMapping("/api/alunos")
     public ResponseEntity<Contratos.Mensagem> cadastrar(@RequestBody(required = false) Contratos.AlunoPedido pedido) {
-        alunoService.salvar(entidade(pedido, null), instituicaoDe(pedido));
+        if (pedido == null) {
+            throw new IllegalArgumentException("Preencha os dados do aluno");
+        }
+        alunoService.salvar(pedido.paraEntidade(null), pedido.instituicaoObrigatoria());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Contratos.Mensagem.de("Cadastro realizado. Entre com seu e-mail e senha."));
     }
@@ -54,7 +57,10 @@ public class AlunoController {
     @PutMapping("/api/aluno")
     public Contratos.Mensagem atualizar(@RequestBody(required = false) Contratos.AlunoPedido pedido, HttpSession session) {
         SessaoUsuario sessao = SessaoGuard.exigir(session, SessaoUsuario.Papel.ALUNO);
-        Aluno salvo = alunoService.salvar(entidade(pedido, sessao.getId()), instituicaoDe(pedido));
+        if (pedido == null) {
+            throw new IllegalArgumentException("Preencha os dados do aluno");
+        }
+        Aluno salvo = alunoService.salvar(pedido.paraEntidade(sessao.getId()), pedido.instituicaoObrigatoria());
         session.setAttribute(SessaoUsuario.CHAVE,
                 new SessaoUsuario(salvo.getId(), salvo.getNome(), salvo.getEmail(), SessaoUsuario.Papel.ALUNO));
         return Contratos.Mensagem.de("Dados atualizados.");
@@ -101,28 +107,5 @@ public class AlunoController {
                 "Resgate concluído. Código do cupom: " + resgate.getCodigoCupom()
                         + ". As notificações para você e para a empresa foram registradas para envio.",
                 resgate.getCodigoCupom());
-    }
-
-    private Aluno entidade(Contratos.AlunoPedido pedido, Long id) {
-        if (pedido == null) {
-            throw new IllegalArgumentException("Preencha os dados do aluno");
-        }
-        Aluno aluno = new Aluno();
-        aluno.setId(id);
-        aluno.setNome(pedido.nome());
-        aluno.setEmail(pedido.email());
-        aluno.setSenha(pedido.senha());
-        aluno.setCpf(pedido.cpf());
-        aluno.setRg(pedido.rg());
-        aluno.setEndereco(pedido.endereco());
-        aluno.setCurso(pedido.curso());
-        return aluno;
-    }
-
-    private Long instituicaoDe(Contratos.AlunoPedido pedido) {
-        if (pedido == null || pedido.instituicaoId() == null) {
-            throw new IllegalArgumentException("Selecione a instituição");
-        }
-        return pedido.instituicaoId();
     }
 }

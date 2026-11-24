@@ -42,7 +42,10 @@ public class EmpresaController {
 
     @PostMapping("/api/empresas")
     public ResponseEntity<Contratos.Mensagem> cadastrar(@RequestBody(required = false) Contratos.EmpresaPedido pedido) {
-        empresaService.salvar(entidade(pedido, null));
+        if (pedido == null) {
+            throw new IllegalArgumentException("Preencha os dados da empresa");
+        }
+        empresaService.salvar(pedido.paraEntidade(null));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Contratos.Mensagem.de("Cadastro realizado. Entre para cadastrar as vantagens."));
     }
@@ -60,7 +63,10 @@ public class EmpresaController {
     @PutMapping("/api/empresa")
     public Contratos.Mensagem atualizar(@RequestBody(required = false) Contratos.EmpresaPedido pedido, HttpSession session) {
         SessaoUsuario sessao = SessaoGuard.exigir(session, SessaoUsuario.Papel.EMPRESA);
-        EmpresaParceira salva = empresaService.salvar(entidade(pedido, sessao.getId()));
+        if (pedido == null) {
+            throw new IllegalArgumentException("Preencha os dados da empresa");
+        }
+        EmpresaParceira salva = empresaService.salvar(pedido.paraEntidade(sessao.getId()));
         session.setAttribute(SessaoUsuario.CHAVE,
                 new SessaoUsuario(salva.getId(), salva.getNome(), salva.getEmail(), SessaoUsuario.Papel.EMPRESA));
         return Contratos.Mensagem.de("Dados atualizados.");
@@ -116,18 +122,5 @@ public class EmpresaController {
                     .body(Contratos.Mensagem.de("Não é possível excluir: alunos já resgataram esta vantagem."));
         }
         return ResponseEntity.ok(Contratos.Mensagem.de("Vantagem excluída."));
-    }
-
-    private EmpresaParceira entidade(Contratos.EmpresaPedido pedido, Long id) {
-        if (pedido == null) {
-            throw new IllegalArgumentException("Preencha os dados da empresa");
-        }
-        EmpresaParceira empresa = new EmpresaParceira();
-        empresa.setId(id);
-        empresa.setNome(pedido.nome());
-        empresa.setEmail(pedido.email());
-        empresa.setSenha(pedido.senha());
-        empresa.setCnpj(pedido.cnpj());
-        return empresa;
     }
 }
